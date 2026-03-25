@@ -1,7 +1,5 @@
-package org.example.testfx.UiSlop.screens;
+package org.example.testfx.Ui.screens;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -10,18 +8,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
-import org.example.testfx.UiSlop.Screen;
+import org.example.testfx.Ui.Screen;
 
 import java.util.function.Consumer;
 
-public class InitialParametersFormScreen implements Screen {
+public class InitialPlateParametersFormScreen implements Screen {
 
     final private BorderPane root;
     private NumeralInitialPlateParameters result;
     private final Consumer<NumeralInitialPlateParameters> callback;
 
 
-    public InitialParametersFormScreen(Consumer<NumeralInitialPlateParameters> callback) {
+    public InitialPlateParametersFormScreen(Consumer<NumeralInitialPlateParameters> callback) {
         this.callback = callback;
         root = new BorderPane();
         VBox vertInputLayout = new VBox();
@@ -85,7 +83,7 @@ public class InitialParametersFormScreen implements Screen {
     }
 
     private NumeralInitialPlateParameters handleInput(String widthStr, String heightStr, String densityStr,
-                                                      String heatCapacityStr, String conductivityStr, String temperatureStr) throws NumberFormatException{
+                                                      String heatCapacityStr, String conductivityStr, String temperatureStr) throws NumberFormatException, IllegalArgumentException{
         double width = fromStrToDouble(widthStr, "ширина");
         double height = fromStrToDouble(heightStr, "высота");
         double density = fromStrToDouble(densityStr, "плотность");

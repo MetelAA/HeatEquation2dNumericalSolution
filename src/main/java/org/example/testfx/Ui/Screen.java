@@ -1,4 +1,4 @@
-package org.example.testfx.UiSlop;
+package org.example.testfx.Ui;
 
 import javafx.scene.Parent;
 

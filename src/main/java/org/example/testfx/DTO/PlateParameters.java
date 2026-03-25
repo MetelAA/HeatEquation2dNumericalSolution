@@ -1,12 +1,11 @@
 package org.example.testfx.DTO;
 
-public class InitialPlateParameters {
+public class PlateParameters {
     private NumeralInitialPlateParameters numeralParameters;
     private String boundaryTemperatureEquationTop;
     private String boundaryTemperatureEquationBottom;
-    private Double modelSpeed;
 
-    public InitialPlateParameters() {
+    public PlateParameters() {
     }
 
     public void setNumeralParameters(NumeralInitialPlateParameters numeralParameters) {
@@ -21,31 +20,23 @@ public class InitialPlateParameters {
         this.boundaryTemperatureEquationBottom = boundaryTemperatureEquationBottom;
     }
 
-    public void setModelSpeed(Double modelSpeed) {
-        this.modelSpeed = modelSpeed;
-    }
 
     public NumeralInitialPlateParameters getNumeralParameters() {
         return numeralParameters;
     }
 
     public String getBoundaryTemperatureEquationTop() {
-        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null || modelSpeed == null)
+        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null)
             throw new NullPointerException("one of fields is empty");
         return boundaryTemperatureEquationTop;
     }
 
     public String getBoundaryTemperatureEquationBottom() {
-        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null || modelSpeed == null)
+        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null)
             throw new NullPointerException("one of fields is empty");
         return boundaryTemperatureEquationBottom;
     }
 
-    public Double getModelSpeed() {
-        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null || modelSpeed == null)
-            throw new NullPointerException("one of fields is empty");
-        return modelSpeed;
-    }
 
     @Override
     public String toString() {
@@ -53,7 +44,6 @@ public class InitialPlateParameters {
                 "numeralParameters=" + numeralParameters +
                 ", boundaryTemperatureEquationTop='" + boundaryTemperatureEquationTop + '\'' +
                 ", boundaryTemperatureEquationBottom='" + boundaryTemperatureEquationBottom + '\'' +
-                ", modelSpeed=" + modelSpeed +
                 '}';
     }
 }

@@ -1,4 +1,4 @@
-package org.example.testfx.UiSlop.screens;
+package org.example.testfx.Ui.screens;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -15,7 +15,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import org.example.testfx.UiSlop.Screen;
+import org.example.testfx.Ui.Screen;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,27 +3,29 @@ package org.example.testfx;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.example.testfx.Constants.Constants;
-import org.example.testfx.DTO.InitialPlateParameters;
+import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
-import org.example.testfx.UiSlop.Screen;
-import org.example.testfx.UiSlop.screens.*;
+import org.example.testfx.DTO.SimulationParameters;
+import org.example.testfx.Ui.Screen;
+import org.example.testfx.Ui.screens.*;
+import org.example.testfx.utils.InitParametersFinishedCallback;
 
 import java.util.function.Consumer;
 
 public class Controller {
     private final Stage stage;
-    private InitialPlateParameters initParams;
+    private PlateParameters initParams;
     private int borderTemperatureConfigureStage = 0;
-    private final Consumer<InitialPlateParameters> callback;
+    private final InitParametersFinishedCallback callback;
 
 
-    public Controller(Stage stage, Consumer<InitialPlateParameters> callback) {
+    public Controller(Stage stage, InitParametersFinishedCallback callback) {
         this.stage = stage;
         this.callback = callback;
     }
 
     public void collectInitialData(){
-        initParams = new InitialPlateParameters();
+        initParams = new PlateParameters();
         showNumeralParamCollectorScreen();
     }
 
@@ -32,7 +34,7 @@ public class Controller {
             initParams.setNumeralParameters(res);
             showBorderTemperatureSelectionTypeCollectorScreen();
         };
-        Screen screen = new InitialParametersFormScreen(firstScreenConsumer);
+        Screen screen = new InitialPlateParametersFormScreen(firstScreenConsumer);
         stage.setScene(new Scene(screen.getView(), 800, 600));
         stage.show();
     }
@@ -90,11 +92,10 @@ public class Controller {
     }
 
     private void showSpeedParameterCollectorScreen(){
-        Consumer<Double> thirdConsumer = res -> {
-            initParams.setModelSpeed(res);
-            callback.accept(initParams);
+        Consumer<SimulationParameters> thirdConsumer = res -> {
+            callback.callback(initParams, res);
         };
-        Screen screen = new SpeedSelectScreen(thirdConsumer);
+        Screen screen = new SimulationParameterSelectScreen(thirdConsumer);
         stage.setScene(new Scene(screen.getView(), 800, 600));
         stage.show();
     }

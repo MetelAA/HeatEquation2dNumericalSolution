@@ -1,4 +1,4 @@
-package org.example.testfx.UiSlop.screens;
+package org.example.testfx.Ui.screens;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import org.example.testfx.UiSlop.Screen;
+import org.example.testfx.Ui.Screen;
 
 import java.util.function.Consumer;
 
