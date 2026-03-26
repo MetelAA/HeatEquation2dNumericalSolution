@@ -1,13 +1,19 @@
 package org.example.testfx.HeatEquation;
 
+import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
-import org.example.testfx.DTO.SimulationParameters;
+import org.example.testfx.HeatEquation.executors.FirstHalfStepRunnable;
+import org.example.testfx.HeatEquation.executors.SecondHalfStepRunnable;
+import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
 import org.example.testfx.utils.ExpressionParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class HeatEquationCore {
     private final PlateParameters plateParams;
@@ -17,14 +23,14 @@ public class HeatEquationCore {
     private final double rx, ry; //те самые r-ки
     private final double[][] tMap;
     private final ThreeDiagonalMatrix firstStepMatrix;
-    private final ThreeDiagonalMatrix secondStepMatrix;
-    private final double[] rightPartFirstStep;
-    private final double[] rightPartSecondStep;
+    private final ThreeDiagonalMatrix secondStepMatrix; //инициализировать размером ny-2, тк см докс
     private final double[][] tStepMap;
+
+    private final ThreadLocal<ThreadLocalVectors> threadLocalVectorsFirstStep, threadLocalVectorsSecondStep; // умные контейнеры для уменьшения расхода памяти (на один поток, коих конечное кол-во, выделяется по 3 массива единожды, при первом вызове метода get на ThreadLocal инстансе)
+    private final ExecutorService executorService;
 
     public HeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
         this.plateParams = plateParams;
-
         this.dt = dtC;
 
         int acc;
@@ -74,17 +80,60 @@ public class HeatEquationCore {
         //заполняем её края, которые некогда не должны быть изменены, они не будут нести никакой полезной информации, но пусть будут, дабы в индексации не путаться и проверки можно было провести, можно потом убрать 3 строки ниже
         tStepMap[0] = Arrays.copyOf(tMap[0], nx);
         tStepMap[ny-1] = Arrays.copyOf(tMap[ny-1], nx);
+
+
+        // начинаем инициализировать нужное для работы потоков
+        threadLocalVectorsFirstStep = ThreadLocal.withInitial(
+                () -> new ThreadLocalVectors(
+                        new double[nx],
+                        new double[nx],
+                        new double[nx]
+                ));
+        threadLocalVectorsSecondStep = ThreadLocal.withInitial(
+                () -> new ThreadLocalVectors(
+                        new double[ny-2],
+                        new double[ny-2],
+                        new double[ny-2]
+                ));
+
+        executorService = Executors.newFixedThreadPool(Constants.threadCount);
     }
 
 
-    public void step(ExecutorService executor) {
+    public void step() {
+        //после выполнения первого полушага, актуальные значения лежат в tStepMap, а устаревшие в tMap, меняем их местами
+
+        List<Future<?>> awaitList = new ArrayList<>(ny-1);
+        for (int j = 1; j < ny-1; j++) {
+            FirstHalfStepRunnable firstHalfStepIter = new FirstHalfStepRunnable(tMap, tStepMap, firstStepMatrix, ry, nx, ny, j, threadLocalVectorsFirstStep);
+            awaitList.set(j, executorService.submit(firstHalfStepIter));
+        }
+
+        for (int j = 1; j < ny-1; j++) {
+            try {
+                awaitList.get(j).get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Ошибка в потоке на j-ой|" + j + "| итерации первого полушага с сообщением: " + e);
+            }
+        }
+
+        //обязательно дождаться конца первого для консистентности данных
+        awaitList = new ArrayList<>(nx-1);
+        for (int i = 0; i < nx - 1; i++) {
+            SecondHalfStepRunnable secondHalfStepIter = new SecondHalfStepRunnable(tStepMap, tMap, secondStepMatrix, rx, ry, nx, ny, i, threadLocalVectorsSecondStep);
+            awaitList.set(i, executorService.submit(secondHalfStepIter));
+        }
+
+        for (int i = 0; i < nx - 1; i++) {
+            try {
+                awaitList.get(i).get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException("Ошибка в потоке на i-ой |" + i + "| итерации второго полушага с сообщением: " + e);
+            }
+        }
 
     }
 
-
-    public void firstStep(){
-
-    }
 
 
 }
