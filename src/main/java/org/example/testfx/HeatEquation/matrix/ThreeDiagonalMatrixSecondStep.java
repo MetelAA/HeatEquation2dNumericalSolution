@@ -1,12 +1,12 @@
-package org.example.testfx.HeatEquation;
+package org.example.testfx.HeatEquation.matrix;
 
-public class ThreeDiagonalMatrix {
+public class ThreeDiagonalMatrixSecondStep implements ThreeDiagonalMatrix{
     private final int size;
     private final double centralValue, sideValue;
 
     private final MatrixRow staticRow;
 
-    public ThreeDiagonalMatrix(int size, double r) {
+    public ThreeDiagonalMatrixSecondStep(int size, double r) {
         // условная r-ка в зависимости от входных параметров это или rx или ry
         this.size = size;
 
@@ -24,12 +24,5 @@ public class ThreeDiagonalMatrix {
         return staticRow;
     }
 
-    public class MatrixRow{
-        public final double a, b, c;
-        public MatrixRow(double a, double b, double c) {
-            this.a = a;
-            this.b = b;
-            this.c = c;
-        }
-    }
+
 }

@@ -2,7 +2,6 @@ module org.example.testfx {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
-    requires org.example.testfx;
 
 
     opens org.example.testfx to javafx.fxml;

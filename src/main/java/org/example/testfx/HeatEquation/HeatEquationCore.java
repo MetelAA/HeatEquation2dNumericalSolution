@@ -5,6 +5,8 @@ import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.HeatEquation.executors.FirstHalfStepRunnable;
 import org.example.testfx.HeatEquation.executors.SecondHalfStepRunnable;
 import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixFirstStep;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
 import org.example.testfx.utils.ExpressionParser;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static java.lang.Math.pow;
+
 public class HeatEquationCore {
     private final PlateParameters plateParams;
 
@@ -22,8 +26,8 @@ public class HeatEquationCore {
     private final int nx, ny;
     private final double rx, ry; //те самые r-ки
     private final double[][] tMap;
-    private final ThreeDiagonalMatrix firstStepMatrix;
-    private final ThreeDiagonalMatrix secondStepMatrix; //инициализировать размером ny-2, тк см докс
+    private final ThreeDiagonalMatrixFirstStep firstStepMatrix;
+    private final ThreeDiagonalMatrixSecondStep secondStepMatrix; //инициализировать размером ny-2, тк см докс
     private final double[][] tStepMap;
 
     private final ThreadLocal<ThreadLocalVectors> threadLocalVectorsFirstStep, threadLocalVectorsSecondStep; // умные контейнеры для уменьшения расхода памяти (на один поток, коих конечное кол-во, выделяется по 3 массива единожды, при первом вызове метода get на ThreadLocal инстансе)
@@ -69,11 +73,11 @@ public class HeatEquationCore {
 
         //коэффициент температуропроводности, которые не теплопроводности, а который в r-ках
         double thermalDiffusivity = plateParams.getNumeralParameters().heatConductivity() / (plateParams.getNumeralParameters().density() * plateParams.getNumeralParameters().heatCapacity());
-        rx = (thermalDiffusivity * dt) / (2*dx);
-        ry = (thermalDiffusivity * dt) / (2*dy);
+        rx = (thermalDiffusivity * dt) / (2*pow(dx, 2));
+        ry = (thermalDiffusivity * dt) / (2*pow(dy, 2));
         //считаем неизменяемые матрицы для шагов метода прогонки
-        firstStepMatrix = new ThreeDiagonalMatrix(nx, rx);
-        secondStepMatrix = new ThreeDiagonalMatrix(ny - 2, ry);
+        firstStepMatrix = new ThreeDiagonalMatrixFirstStep(nx, rx);
+        secondStepMatrix = new ThreeDiagonalMatrixSecondStep(ny - 2, ry);
 
         //выделяем память под промежуточную tMap для первого полушага, которая далее используется во втором
         tStepMap = new double[ny][nx];
@@ -106,10 +110,10 @@ public class HeatEquationCore {
         List<Future<?>> awaitList = new ArrayList<>(ny-1);
         for (int j = 1; j < ny-1; j++) {
             FirstHalfStepRunnable firstHalfStepIter = new FirstHalfStepRunnable(tMap, tStepMap, firstStepMatrix, ry, nx, ny, j, threadLocalVectorsFirstStep);
-            awaitList.set(j, executorService.submit(firstHalfStepIter));
+            awaitList.add(executorService.submit(firstHalfStepIter));
         }
 
-        for (int j = 1; j < ny-1; j++) {
+        for (int j = 0; j < awaitList.size(); j++) {
             try {
                 awaitList.get(j).get();
             } catch (InterruptedException | ExecutionException e) {
@@ -118,13 +122,13 @@ public class HeatEquationCore {
         }
 
         //обязательно дождаться конца первого для консистентности данных
-        awaitList = new ArrayList<>(nx-1);
-        for (int i = 0; i < nx - 1; i++) {
+        awaitList = new ArrayList<>(nx);
+        for (int i = 0; i < nx; i++) {
             SecondHalfStepRunnable secondHalfStepIter = new SecondHalfStepRunnable(tStepMap, tMap, secondStepMatrix, rx, ry, nx, ny, i, threadLocalVectorsSecondStep);
-            awaitList.set(i, executorService.submit(secondHalfStepIter));
+            awaitList.add(executorService.submit(secondHalfStepIter));
         }
 
-        for (int i = 0; i < nx - 1; i++) {
+        for (int i = 0; i < awaitList.size(); i++) {
             try {
                 awaitList.get(i).get();
             } catch (InterruptedException | ExecutionException e) {

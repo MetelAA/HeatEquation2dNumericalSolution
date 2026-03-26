@@ -1,6 +1,7 @@
 package org.example.testfx.HeatEquation.executors;
 
-import org.example.testfx.HeatEquation.ThreeDiagonalMatrix;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrix;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
 import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
 
 public class SecondHalfStepRunnable implements Runnable {
@@ -18,7 +19,7 @@ public class SecondHalfStepRunnable implements Runnable {
     // во второй части нет уравнений для верхней и нижней строк, тк там температура константа, а значит у нас всего ny-2 уравнений на каждом шаге по i,
     // соответственно в rightPartVector всего ny-2 значений, а итоговый вектор заполняем с офсетом, границы переносим тоже здесь!
     // тоже самое с ksi и eta vectors!
-    public SecondHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrix baseMatrix, double rx, double ry, int nx, int ny, int i, ThreadLocal<ThreadLocalVectors> vectors) {
+    public SecondHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrixSecondStep baseMatrix, double rx, double ry, int nx, int ny, int i, ThreadLocal<ThreadLocalVectors> vectors) {
         this.tMapPrevious = tMapPrevious;
         this.tStepMap = tStepMap;
         this.baseMatrix = baseMatrix;
@@ -38,16 +39,16 @@ public class SecondHalfStepRunnable implements Runnable {
     public void run() {
         //инициализация правой части из-за условий Дирихле
         if (i == 0) {
-            for (int j = 0; j < ny - 3; j++) {
-                rightPartVector[j] = (1 - 2 * rx) * tMapPrevious[j][i] + 2 * rx * tMapPrevious[j][i + 1];
+            for (int j = 0; j < ny - 2; j++) {
+                rightPartVector[j] = (1 - 2 * rx) * tMapPrevious[j+1][i] + 2 * rx * tMapPrevious[j+1][i + 1];
             }
         } else if (i == nx - 1) {
-            for (int j = 0; j < ny - 3; j++) {
-                rightPartVector[j] = (1 - 2 * rx) * tMapPrevious[j][i] + 2 * rx * tMapPrevious[j][i - 1];
+            for (int j = 0; j < ny - 2; j++) {
+                rightPartVector[j] = (1 - 2 * rx) * tMapPrevious[j+1][i] + 2 * rx * tMapPrevious[j+1][i - 1];
             }
         } else {
-            for (int j = 0; j < ny - 3; j++) {
-                rightPartVector[j] = tMapPrevious[j][i] + rx * (tMapPrevious[j][i - 1] - 2 * tMapPrevious[j][i] + tMapPrevious[j][i + 1]);
+            for (int j = 0; j < ny - 2; j++) {
+                rightPartVector[j] = tMapPrevious[j+1][i] + rx * (tMapPrevious[j+1][i - 1] - 2 * tMapPrevious[j+1][i] + tMapPrevious[j+1][i + 1]);
             }
         }
 

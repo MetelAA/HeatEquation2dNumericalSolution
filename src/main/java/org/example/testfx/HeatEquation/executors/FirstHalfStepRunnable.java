@@ -1,6 +1,8 @@
 package org.example.testfx.HeatEquation.executors;
 
-import org.example.testfx.HeatEquation.ThreeDiagonalMatrix;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrix;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixFirstStep;
+import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
 import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
 
 public class FirstHalfStepRunnable implements Runnable {
@@ -14,7 +16,7 @@ public class FirstHalfStepRunnable implements Runnable {
     private final double[] ksiVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
     private final double[] etaVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
 
-    public FirstHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrix baseMatrix, double ry, int nx, int ny, int j, ThreadLocal<ThreadLocalVectors> vectors) {
+    public FirstHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrixFirstStep baseMatrix, double ry, int nx, int ny, int j, ThreadLocal<ThreadLocalVectors> vectors) {
 
         if (j <= 0 || j >= ny)
             throw new IllegalArgumentException("j (по y) должна находиться в диапазоне от 1 до N_y-2");
