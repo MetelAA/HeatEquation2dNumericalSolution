@@ -9,13 +9,16 @@ import org.example.testfx.utils.InitParametersFinishedCallback;
 public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
-        Controller screenController = new Controller(primaryStage, new InitParametersFinishedCallback() {
+        InputInitController screenInputInitController = new InputInitController(primaryStage, new InitParametersFinishedCallback() {
             @Override
             public void callback(PlateParameters plateParameters, SimulationParameters simulationParameters) {
                 System.out.println("plateParams: " + plateParameters + "  simParams: " + simulationParameters);
+                System.out.println("Запускаю CoreController");
+                CoreController coreController = new CoreController(plateParameters, simulationParameters);
+                coreController.run();
             }
         });
-        screenController.collectInitialData();
+        screenInputInitController.collectInitialData();
     }
 
 

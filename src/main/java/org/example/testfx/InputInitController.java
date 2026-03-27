@@ -12,14 +12,14 @@ import org.example.testfx.utils.InitParametersFinishedCallback;
 
 import java.util.function.Consumer;
 
-public class Controller {
+public class InputInitController {
     private final Stage stage;
     private PlateParameters initParams;
     private int borderTemperatureConfigureStage = 0;
     private final InitParametersFinishedCallback callback;
 
 
-    public Controller(Stage stage, InitParametersFinishedCallback callback) {
+    public InputInitController(Stage stage, InitParametersFinishedCallback callback) {
         this.stage = stage;
         this.callback = callback;
     }

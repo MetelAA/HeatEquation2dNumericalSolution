@@ -34,6 +34,7 @@ public class HeatEquationCore {
     private final ExecutorService executorService;
 
     public HeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
+        System.out.println("HeatEquationCore constructor");
         this.plateParams = plateParams;
         this.dt = dtC;
 
@@ -138,6 +139,15 @@ public class HeatEquationCore {
 
     }
 
+    public double[][] gettMap() {
+        return tMap;
+    }
 
+    public int getNx() {
+        return nx;
+    }
 
+    public int getNy() {
+        return ny;
+    }
 }
