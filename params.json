@@ -1,0 +1,20 @@
+{
+  "plateParameters": {
+    "numeralParameters": {
+      "width": 1,
+      "height": 1,
+      "density": 2700.0,
+      "heatCapacity": 900.0,
+      "heatConductivity": 221.0,
+      "plateTemperature": 200.0
+    },
+    "boundaryTemperatureEquationTop": "-20",
+    "boundaryTemperatureEquationBottom": "-20"
+  },
+  "simulationParameters": {
+    "dt": 1,
+    "dx": 0.05,
+    "dy": 0.05,
+    "time": 18000
+  }
+}

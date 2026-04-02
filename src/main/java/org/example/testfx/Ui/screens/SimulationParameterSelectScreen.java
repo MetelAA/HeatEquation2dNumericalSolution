@@ -24,20 +24,25 @@ public class SimulationParameterSelectScreen implements Screen {
 
         VBox vl = new VBox();
 
-        Text dtText = new Text("Введите шаг по времени, dt:");
-        Text dxText = new Text("Введите шаг по горизонтали, dx:");
-        Text dyText = new Text("Введите шаг по вертикали, dy:");
-        Text timeText = new Text("Введите длину симуляции, time:");
+        Text dtText = new Text("Введите шаг по времени, dt, сек:");
+        Text dxText = new Text("Введите шаг по горизонтали, dx, м:");
+        Text dyText = new Text("Введите шаг по вертикали, dy, м:");
+        Text timeText = new Text("Введите длину симуляции, time, сек:");
 
         TextField dtField = new TextField();
+        dtField.setPromptText("сек");
         TextField dxField = new TextField();
+        dxField.setPromptText("м");
         TextField dyField = new TextField();
+        dyField.setPromptText("м");
         TextField timeField = new TextField();
+        timeField.setPromptText("сек");
 
         Text errorText = new Text();
         errorText.setStyle("-fx-fill: red; -fx-font-weight: bold; -fx-font-size: 14px;");
 
         Button validateBtn = new Button("Далее");
+
 
         validateBtn.setOnAction(e ->
             {
@@ -48,7 +53,7 @@ public class SimulationParameterSelectScreen implements Screen {
                             dyField.getText(),
                             timeField.getText()
                     ));
-                }catch(Exception ex) {
+                } catch (IllegalArgumentException ex){
                     errorText.setText(ex.getMessage());
                 }
             }

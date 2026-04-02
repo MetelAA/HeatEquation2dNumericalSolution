@@ -1,10 +1,12 @@
 package org.example.testfx.HeatEquation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.HeatEquation.executors.FirstHalfStepRunnable;
 import org.example.testfx.HeatEquation.executors.SecondHalfStepRunnable;
-import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
+import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadVectors;
 import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixFirstStep;
 import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
 import org.example.testfx.utils.ExpressionParser;
@@ -20,6 +22,8 @@ import java.util.concurrent.Future;
 import static java.lang.Math.pow;
 
 public class HeatEquationCore {
+    private final static Logger log = LogManager.getLogger(HeatEquationCore.class);
+
     private final PlateParameters plateParams;
 
     private final double dx, dy, dt;
@@ -30,11 +34,11 @@ public class HeatEquationCore {
     private final ThreeDiagonalMatrixSecondStep secondStepMatrix; //инициализировать размером ny-2, тк см докс
     private final double[][] tStepMap;
 
-    private final ThreadLocal<ThreadLocalVectors> threadLocalVectorsFirstStep, threadLocalVectorsSecondStep; // умные контейнеры для уменьшения расхода памяти (на один поток, коих конечное кол-во, выделяется по 3 массива единожды, при первом вызове метода get на ThreadLocal инстансе)
+    private final ThreadLocal<ThreadVectors> threadLocalVectorsFirstStep, threadLocalVectorsSecondStep; // умные контейнеры для уменьшения расхода памяти (на один поток, коих конечное кол-во, выделяется по 3 массива единожды, при первом вызове метода get на ThreadLocal инстансе)
     private final ExecutorService executorService;
 
     public HeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
-        System.out.println("HeatEquationCore constructor");
+        log.debug("HeatEquationCore construction start");
         this.plateParams = plateParams;
         this.dt = dtC;
 
@@ -53,11 +57,19 @@ public class HeatEquationCore {
             ny = acc;
         dy = dyC;
 
+
         tMap = new double[ny][nx]; // инициализируем сетку температур
 
-        ExpressionParser.Expression expressionForTopBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationTop());
-        ExpressionParser.Expression expressionForBottomBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationBottom());
-
+        log.debug("Expression parser setting up!");
+        ExpressionParser.Expression expressionForTopBorder;
+        ExpressionParser.Expression expressionForBottomBorder;
+        try {
+            expressionForTopBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationTop());
+            expressionForBottomBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationBottom());
+        } catch (ExpressionParser.ExpressionException e) {
+            throw new RuntimeException("HeatEquationCore: expression parser setting up exception, with message: " + e);
+        }
+        log.debug("Expression parser set up!");
 
         for (int j = 1; j < ny - 1; j++) { //задаём t0 для всех кроме границ
             for (int i = 0; i < nx; i++) {
@@ -80,6 +92,10 @@ public class HeatEquationCore {
         firstStepMatrix = new ThreeDiagonalMatrixFirstStep(nx, rx);
         secondStepMatrix = new ThreeDiagonalMatrixSecondStep(ny - 2, ry);
 
+        log.info("thermalDiffusivity = {}", thermalDiffusivity);
+        log.info("rx = {}, ry = {}", rx, ry);
+        log.info("nx = {}, ny = {}", nx, ny);
+
         //выделяем память под промежуточную tMap для первого полушага, которая далее используется во втором
         tStepMap = new double[ny][nx];
         //заполняем её края, которые некогда не должны быть изменены, они не будут нести никакой полезной информации, но пусть будут, дабы в индексации не путаться и проверки можно было провести, можно потом убрать 3 строки ниже
@@ -89,25 +105,27 @@ public class HeatEquationCore {
 
         // начинаем инициализировать нужное для работы потоков
         threadLocalVectorsFirstStep = ThreadLocal.withInitial(
-                () -> new ThreadLocalVectors(
+                () -> new ThreadVectors(
                         new double[nx],
                         new double[nx],
                         new double[nx]
                 ));
         threadLocalVectorsSecondStep = ThreadLocal.withInitial(
-                () -> new ThreadLocalVectors(
+                () -> new ThreadVectors(
                         new double[ny-2],
                         new double[ny-2],
                         new double[ny-2]
                 ));
 
         executorService = Executors.newFixedThreadPool(Constants.threadCount);
+
+        log.info("HeatEquationCore initialized successfully");
     }
 
 
     public void step() {
         //после выполнения первого полушага, актуальные значения лежат в tStepMap, а устаревшие в tMap, меняем их местами
-
+        log.trace("time step start!");
         List<Future<?>> awaitList = new ArrayList<>(ny-1);
         for (int j = 1; j < ny-1; j++) {
             FirstHalfStepRunnable firstHalfStepIter = new FirstHalfStepRunnable(tMap, tStepMap, firstStepMatrix, ry, nx, ny, j, threadLocalVectorsFirstStep);
@@ -118,7 +136,7 @@ public class HeatEquationCore {
             try {
                 awaitList.get(j).get();
             } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException("Ошибка в потоке на j-ой|" + j + "| итерации первого полушага с сообщением: " + e);
+                throw new RuntimeException("Exception in thread on j|" + j + "| iter first half step, with message: " + e);
             }
         }
 
@@ -133,10 +151,10 @@ public class HeatEquationCore {
             try {
                 awaitList.get(i).get();
             } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException("Ошибка в потоке на i-ой |" + i + "| итерации второго полушага с сообщением: " + e);
+                throw new RuntimeException("Exception in thread on i |" + i + "| iter second half step, with message: " + e);
             }
         }
-
+        log.trace("time step ended!");
     }
 
     public double[][] gettMap() {

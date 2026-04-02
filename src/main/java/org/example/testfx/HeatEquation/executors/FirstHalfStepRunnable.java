@@ -1,25 +1,25 @@
 package org.example.testfx.HeatEquation.executors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrix;
 import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixFirstStep;
-import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
-import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
+import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadVectors;
 
 public class FirstHalfStepRunnable implements Runnable {
+    private final static Logger log = LogManager.getLogger(FirstHalfStepRunnable.class);
 
     private final double[][] tMapPrevious, tStepMap; //общие для всех потоков, работаем только в своей строке
     private final ThreeDiagonalMatrix baseMatrix; //общие для всех потоков, работаем только в своей строке
     private final double ry;
     private final int nx, j;
     //на первом полушаге размеры этих троих - nx
-    private final double[] rightPartVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим,
-    private final double[] ksiVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
-    private final double[] etaVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
+    private final ThreadLocal<ThreadVectors> threadLocalVectors;
 
-    public FirstHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrixFirstStep baseMatrix, double ry, int nx, int ny, int j, ThreadLocal<ThreadLocalVectors> vectors) {
+    public FirstHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrixFirstStep baseMatrix, double ry, int nx, int ny, int j, ThreadLocal<ThreadVectors> vectors) {
 
         if (j <= 0 || j >= ny)
-            throw new IllegalArgumentException("j (по y) должна находиться в диапазоне от 1 до N_y-2");
+            throw new IllegalArgumentException("j (by y) must be in range from 1 to n_y-2");
 
         this.tMapPrevious = tMapPrevious;
         this.tStepMap = tStepMap;
@@ -27,14 +27,18 @@ public class FirstHalfStepRunnable implements Runnable {
         this.baseMatrix = baseMatrix;
         this.nx = nx;
         this.j = j;
-        ThreadLocalVectors threadVectors = vectors.get();
-        this.rightPartVector = threadVectors.rightPartVector;
-        this.ksiVector = threadVectors.ksiVector;
-        this.etaVector = threadVectors.etaVector;
+        threadLocalVectors = vectors;
     }
 
     @Override
     public void run() {
+        ThreadVectors threadVectors = threadLocalVectors.get();
+        double[] rightPartVector = threadVectors.rightPartVector;// их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим,
+        double[] ksiVector = threadVectors.ksiVector;
+        double[] etaVector = threadVectors.etaVector;
+
+
+        log.trace("FirstHalfStepRunnable from thread: {}, step(by y): {}", Thread.currentThread().getName(), j);
         for (int i = 0; i < nx; i++) {
             rightPartVector[i] = tMapPrevious[j][i] + ry * (tMapPrevious[j - 1][i] - 2 * tMapPrevious[j][i] + tMapPrevious[j + 1][i]);
         }

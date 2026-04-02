@@ -14,7 +14,7 @@ public class ReadWriteTMap {
     }
 
     public void initWriter() throws IOException {
-        writer = new FileWriter(file, true);
+        writer = new FileWriter(file, false);
     }
 
     public void writeMap(double[][] tMap, int step) throws IOException {
@@ -26,5 +26,9 @@ public class ReadWriteTMap {
             writer.append('\n');
         }
         writer.flush();
+    }
+
+    public void closeWriter() throws IOException {
+        writer.close();
     }
 }

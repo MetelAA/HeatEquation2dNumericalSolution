@@ -2,10 +2,10 @@ package org.example.testfx.DTO;
 
 public class SimulationParameters {
 
-    private final double dt;
+    private double dt;
     private double dx;
     private double dy;
-    private final long time;
+    private long time;
 
     public SimulationParameters(double dt, double dx, double dy, long time) {
         this.dt = dt;
@@ -14,6 +14,8 @@ public class SimulationParameters {
         this.time = time;
     }
 
+    public SimulationParameters() {
+    }
 
     public double getDt() {
         return dt;

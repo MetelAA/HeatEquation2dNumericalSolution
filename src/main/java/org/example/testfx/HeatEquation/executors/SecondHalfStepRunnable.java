@@ -1,25 +1,26 @@
 package org.example.testfx.HeatEquation.executors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrix;
 import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
-import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadLocalVectors;
+import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadVectors;
 
 public class SecondHalfStepRunnable implements Runnable {
+    private final static Logger log = LogManager.getLogger(SecondHalfStepRunnable.class);
 
     private final double[][] tMapPrevious, tStepMap; //общие для всех потоков, работает только в своём столбце
     private final ThreeDiagonalMatrix baseMatrix; //общие для всех потоков, работает только в своём столбце
     private final double rx, ry;
     private final int ny, nx, i;
     // на втором полушаге размеры этих троих - ny-2
-    private final double[] rightPartVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
-    private final double[] ksiVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
-    private final double[] etaVector; // их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
+    private final ThreadLocal<ThreadVectors> threadLocalVectors;
 
 
     // во второй части нет уравнений для верхней и нижней строк, тк там температура константа, а значит у нас всего ny-2 уравнений на каждом шаге по i,
     // соответственно в rightPartVector всего ny-2 значений, а итоговый вектор заполняем с офсетом, границы переносим тоже здесь!
     // тоже самое с ksi и eta vectors!
-    public SecondHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrixSecondStep baseMatrix, double rx, double ry, int nx, int ny, int i, ThreadLocal<ThreadLocalVectors> vectors) {
+    public SecondHalfStepRunnable(double[][] tMapPrevious, double[][] tStepMap, ThreeDiagonalMatrixSecondStep baseMatrix, double rx, double ry, int nx, int ny, int i, ThreadLocal<ThreadVectors> vectors) {
         this.tMapPrevious = tMapPrevious;
         this.tStepMap = tStepMap;
         this.baseMatrix = baseMatrix;
@@ -28,15 +29,17 @@ public class SecondHalfStepRunnable implements Runnable {
         this.nx = nx;
         this.ny = ny;
         this.i = i;
-        ThreadLocalVectors threadVectors = vectors.get();
-
-        this.rightPartVector = threadVectors.rightPartVector;
-        this.ksiVector = threadVectors.ksiVector;
-        this.etaVector = threadVectors.etaVector;
+        threadLocalVectors = vectors;
     }
 
     @Override
     public void run() {
+        ThreadVectors threadVectors = threadLocalVectors.get();
+        double[] rightPartVector = threadVectors.rightPartVector;// их должно быть по числу потоков, тк работает несколько потоков и каждый работает со своим
+        double[] ksiVector = threadVectors.ksiVector;
+        double[] etaVector = threadVectors.etaVector;
+
+        log.trace("SecondHalfStepRunnable from thread {}, from step (by x): {}", Thread.currentThread().getName(), i);
         //инициализация правой части из-за условий Дирихле
         if (i == 0) {
             for (int j = 0; j < ny - 2; j++) {

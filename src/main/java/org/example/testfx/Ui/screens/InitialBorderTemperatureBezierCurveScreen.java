@@ -365,7 +365,7 @@ public class InitialBorderTemperatureBezierCurveScreen implements Screen {
         return binomial(n, k) * Math.pow(1 - t, n - k) * Math.pow(t, k);
     }
 
-    /** Вывод уравнения зависимости y от x (интерполяционный полином) */
+    /** Вывод уравнения зависимости y от x (интерполяционный полином) в формате, совместимом с ExpressionParser */
     private void showEquation() {
         int n = N_POINTS;
         if (n < 2) {
@@ -373,9 +373,9 @@ public class InitialBorderTemperatureBezierCurveScreen implements Screen {
             return;
         }
 
-        // Проверка уникальности X (хотя ограничения в перетаскивании это гарантируют)
+        // Проверка уникальности X
         for (int i = 1; i < n; i++) {
-            if (Math.abs(logicalX.get(i) - logicalX.get(i-1)) < 1e-6) {
+            if (Math.abs(logicalX.get(i) - logicalX.get(i - 1)) < 1e-6) {
                 equationArea.setText("Ошибка: точки должны иметь разные X (возможно, слишком близки)");
                 return;
             }
@@ -390,32 +390,54 @@ public class InitialBorderTemperatureBezierCurveScreen implements Screen {
             return;
         }
 
-        // Форматируем уравнение
+        // Форматируем уравнение в виде, понятном ExpressionParser
         StringBuilder sb = new StringBuilder();
         boolean first = true;
+
         for (int i = 0; i < coeff.length; i++) {
             double c = coeff[i];
-            if (Math.abs(c) < 1e-10) continue; // пропускаем почти нулевые члены
+            if (Math.abs(c) < 1e-10) continue; // пропускаем практически нулевые члены
+
+            // Определяем знак
             if (!first) {
                 sb.append(c > 0 ? " + " : " - ");
             } else {
                 if (c < 0) sb.append("-");
                 first = false;
             }
+
             double absC = Math.abs(c);
-            if (i == 0) {
-                sb.append(String.format("%.4f", absC));
+            boolean isOne = Math.abs(absC - 1.0) < 1e-10;
+
+            if (i == 0) { // свободный член
+                sb.append(formatNumber(absC));
             } else {
-                sb.append(String.format("%.4f", absC));
-                if (i == 1) sb.append("*x");
-                else sb.append("*x^").append(i);
+                // Коэффициент (опускаем, если равен 1 или -1)
+                if (!isOne) {
+                    sb.append(formatNumber(absC)).append("*");
+                }
+                sb.append("x");
+                if (i > 1) {
+                    sb.append("^").append(i);
+                }
             }
         }
-        if (first) sb.append("0"); // если все коэффициенты нулевые
 
+        if (first) sb.append("0"); // все коэффициенты нулевые
         equationArea.setText(sb.toString());
         errorLabel.setText("");
         callback.accept(sb.toString());
+    }
+
+    /** Вспомогательный метод для форматирования чисел без лишних нулей */
+    private String formatNumber(double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) return "0";
+        // Убираем trailing zeros после десятичной точки
+        String s = Double.toString(value);
+        if (s.contains(".")) {
+            s = s.replaceAll("0*$", "").replaceAll("\\.$", "");
+        }
+        return s;
     }
 
 

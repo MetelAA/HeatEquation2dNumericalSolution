@@ -58,6 +58,7 @@ public class InputInitController {
 
     private void showBoundaryTemperatureEquationWithBezierCurvesCollectorScreen(){
         Consumer<String> secondScreenConsumer = res -> {
+            System.out.println(res);
             if (borderTemperatureConfigureStage == 0){
                 initParams.setBoundaryTemperatureEquationTop(res);
                 borderTemperatureConfigureStage++;
@@ -75,7 +76,6 @@ public class InputInitController {
 
     private void showBoundaryTemperatureEquationWithSymbolEquationCollectorScreen(){
         Consumer<String> secondScreenConsumer = res -> {
-            System.out.println("equation res - " + res);
             if (borderTemperatureConfigureStage == 0){
                 initParams.setBoundaryTemperatureEquationTop(res);
                 borderTemperatureConfigureStage++;

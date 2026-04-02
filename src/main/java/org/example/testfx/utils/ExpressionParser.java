@@ -9,6 +9,8 @@ import java.util.*;
  *   Expression expr = parser.compile("x^2 + sin(x)");
  *   double y1 = expr.evaluate(2.0);
  *   double y2 = expr.evaluate(3.0);
+ *
+ * @throws ExpressionException если выражение содержит синтаксические ошибки
  */
 public class ExpressionParser {
 
@@ -18,7 +20,7 @@ public class ExpressionParser {
         double evaluate(double x);
     }
 
-    public Expression compile(String expression) {
+    public Expression compile(String expression) throws ExpressionException {
         List<Token> rpn = shuntingYard(tokenize(expression));
         return x -> evalRPN(rpn, x);
     }
@@ -47,7 +49,7 @@ public class ExpressionParser {
     }
 
     // ---------- Токенизация ----------
-    private List<Token> tokenize(String s) {
+    private List<Token> tokenize(String s) throws ExpressionException {
         List<Token> tokens = new ArrayList<>();
         int i = 0;
         int len = s.length();
@@ -61,7 +63,12 @@ public class ExpressionParser {
             if (Character.isDigit(c) || c == '.') {
                 int start = i;
                 while (i < len && (Character.isDigit(s.charAt(i)) || s.charAt(i) == '.')) i++;
-                double num = Double.parseDouble(s.substring(start, i));
+                double num;
+                try {
+                    num = Double.parseDouble(s.substring(start, i));
+                } catch (NumberFormatException e) {
+                    throw new ExpressionException("Некорректное число: " + s.substring(start, i));
+                }
                 tokens.add(new Token(num));
                 continue;
             }
@@ -92,17 +99,17 @@ public class ExpressionParser {
                 if (name.equals("sin") || name.equals("cos")) {
                     tokens.add(new Token(TokenType.FUNCTION, name));
                 } else {
-                    throw new IllegalArgumentException("Неизвестная функция: " + name);
+                    throw new ExpressionException("Неизвестная функция: " + name);
                 }
                 continue;
             }
-            throw new IllegalArgumentException("Недопустимый символ: " + c);
+            throw new ExpressionException("Недопустимый символ: " + c);
         }
         return tokens;
     }
 
     // ---------- Алгоритм сортировочной станции (инфикс -> RPN) ----------
-    private List<Token> shuntingYard(List<Token> tokens) {
+    private List<Token> shuntingYard(List<Token> tokens) throws ExpressionException {
         List<Token> output = new ArrayList<>();
         Deque<Token> stack = new ArrayDeque<>();
 
@@ -157,7 +164,7 @@ public class ExpressionParser {
                     while (!stack.isEmpty() && stack.peek().type != TokenType.LEFT_PAREN) {
                         output.add(stack.pop());
                     }
-                    if (stack.isEmpty()) throw new IllegalArgumentException("Несбалансированные скобки");
+                    if (stack.isEmpty()) throw new ExpressionException("Несбалансированные скобки");
                     stack.pop(); // удаляем '('
                     if (!stack.isEmpty() && stack.peek().type == TokenType.FUNCTION) {
                         output.add(stack.pop());
@@ -168,7 +175,7 @@ public class ExpressionParser {
 
         while (!stack.isEmpty()) {
             Token t = stack.pop();
-            if (t.type == TokenType.LEFT_PAREN) throw new IllegalArgumentException("Несбалансированные скобки");
+            if (t.type == TokenType.LEFT_PAREN) throw new ExpressionException("Несбалансированные скобки");
             output.add(t);
         }
         return output;
@@ -218,5 +225,12 @@ public class ExpressionParser {
 
         if (stack.size() != 1) throw new IllegalArgumentException("Некорректное выражение");
         return stack.pop();
+    }
+
+    // ---------- Пользовательское checked исключение ----------
+    public static class ExpressionException extends Exception {
+        public ExpressionException(String message) {
+            super(message);
+        }
     }
 }
