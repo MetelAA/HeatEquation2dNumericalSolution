@@ -1,4 +1,4 @@
-package org.example.testfx.HeatEquation.matrix;
+package org.example.testfx.HeatEquation.NumSolution.matrix;
 
 public interface ThreeDiagonalMatrix {
     public MatrixRow getMatrixRow(int i);

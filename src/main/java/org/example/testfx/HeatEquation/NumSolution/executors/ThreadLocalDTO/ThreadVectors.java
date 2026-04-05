@@ -1,4 +1,4 @@
-package org.example.testfx.HeatEquation.executors.ThreadLocalDTO;
+package org.example.testfx.HeatEquation.NumSolution.executors.ThreadLocalDTO;
 
 //храним тут три вектора (выделенную память под каждый поток, чтобы каждый раз заново не перевыделять)
 public class ThreadVectors {

@@ -1,10 +1,10 @@
-package org.example.testfx.HeatEquation.executors;
+package org.example.testfx.HeatEquation.NumSolution.executors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrix;
-import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixFirstStep;
-import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadVectors;
+import org.example.testfx.HeatEquation.NumSolution.matrix.ThreeDiagonalMatrix;
+import org.example.testfx.HeatEquation.NumSolution.matrix.ThreeDiagonalMatrixFirstStep;
+import org.example.testfx.HeatEquation.NumSolution.executors.ThreadLocalDTO.ThreadVectors;
 
 public class FirstHalfStepRunnable implements Runnable {
     private final static Logger log = LogManager.getLogger(FirstHalfStepRunnable.class);

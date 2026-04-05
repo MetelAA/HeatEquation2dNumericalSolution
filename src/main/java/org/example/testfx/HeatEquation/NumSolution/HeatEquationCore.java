@@ -1,14 +1,14 @@
-package org.example.testfx.HeatEquation;
+package org.example.testfx.HeatEquation.NumSolution;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
-import org.example.testfx.HeatEquation.executors.FirstHalfStepRunnable;
-import org.example.testfx.HeatEquation.executors.SecondHalfStepRunnable;
-import org.example.testfx.HeatEquation.executors.ThreadLocalDTO.ThreadVectors;
-import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixFirstStep;
-import org.example.testfx.HeatEquation.matrix.ThreeDiagonalMatrixSecondStep;
+import org.example.testfx.HeatEquation.NumSolution.executors.FirstHalfStepRunnable;
+import org.example.testfx.HeatEquation.NumSolution.executors.SecondHalfStepRunnable;
+import org.example.testfx.HeatEquation.NumSolution.executors.ThreadLocalDTO.ThreadVectors;
+import org.example.testfx.HeatEquation.NumSolution.matrix.ThreeDiagonalMatrixFirstStep;
+import org.example.testfx.HeatEquation.NumSolution.matrix.ThreeDiagonalMatrixSecondStep;
 import org.example.testfx.utils.ExpressionParser;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class HeatEquationCore {
     private final ExecutorService executorService;
 
     public HeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
-        log.debug("HeatEquationCore construction start");
+        log.debug("HeatEquationCore constructor start");
         this.plateParams = plateParams;
         this.dt = dtC;
 

@@ -1,4 +1,4 @@
-package org.example.testfx.HeatEquation.matrix;
+package org.example.testfx.HeatEquation.NumSolution.matrix;
 
 public class ThreeDiagonalMatrixFirstStep implements ThreeDiagonalMatrix{
     private final int size;

@@ -5,11 +5,10 @@ import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
-import org.example.testfx.HeatEquation.HeatEquationCore;
+import org.example.testfx.HeatEquation.NumSolution.HeatEquationCore;
 import org.example.testfx.utils.ReadWriteTMap;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class CoreController {
