@@ -6,18 +6,18 @@ import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.HeatEquation.NumSolution.HeatEquationCore;
-import org.example.testfx.utils.ReadWriteTMap;
+import org.example.testfx.utils.ReadWriteTemperatureMap;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class CoreController {
-    private final static Logger log = LogManager.getLogger(CoreController.class);
+public class NumCoreController {
+    private final static Logger log = LogManager.getLogger(NumCoreController.class);
     private final HeatEquationCore heatEquation;
     private final PlateParameters plateParameters;
     private final SimulationParameters simulationParameters;
 
-    public CoreController(PlateParameters plateParameters, SimulationParameters simulationParameters) {
+    public NumCoreController(PlateParameters plateParameters, SimulationParameters simulationParameters) {
         this.plateParameters = plateParameters;
         this.simulationParameters = simulationParameters;
         log.debug("Setting up HeatEquationCore");
@@ -39,7 +39,7 @@ public class CoreController {
         log.info("There are |{}| writes per second and there are |{}| time steps per second", Constants.writesPerSecond, timeStepsPerSecond);
         log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double)(1.0/Constants.writesPerSecond));
         log.info("There will be |{}| total writes", nt / timeStepsPerWrite);
-        ReadWriteTMap mapIO = new ReadWriteTMap("test.txt");
+        ReadWriteTemperatureMap mapIO = new ReadWriteTemperatureMap("test.txt");
         try {
             mapIO.initWriter();
         } catch (IOException e) {
@@ -80,5 +80,9 @@ public class CoreController {
         }
         long secs = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
         log.info("All steps completed, time spent: {}m {}s", secs/60, secs% 60);
+    }
+
+    public HeatEquationCore getHeatEquation() {
+        return heatEquation;
     }
 }

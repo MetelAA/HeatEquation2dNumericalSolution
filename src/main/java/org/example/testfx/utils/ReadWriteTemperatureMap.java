@@ -3,12 +3,12 @@ package org.example.testfx.utils;
 
 import java.io.*;
 
-public class ReadWriteTMap {
+public class ReadWriteTemperatureMap {
     private final File file;
     private FileWriter writer;
     private FileReader reader;
 
-    public ReadWriteTMap(String fileName) {
+    public ReadWriteTemperatureMap(String fileName) {
         file = new File(fileName);
         System.out.println("ReadWriteTMap успешно создан, запись будет проводиться в " + file.getAbsolutePath());
     }
@@ -18,7 +18,7 @@ public class ReadWriteTMap {
     }
 
     public void writeMap(double[][] tMap, int step) throws IOException {
-        writer.write("---------" + step + "---------");
+        writer.write("---------" + step + "---------\n");
         for (double[] doubles : tMap) {
             for (int j = 0; j < tMap[0].length; j++) {
                 writer.write(Double.toString(doubles[j]) + " ");

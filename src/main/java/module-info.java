@@ -12,4 +12,6 @@ module org.example.testfx {
     exports org.example.testfx.Ui;
     exports org.example.testfx.DTO;
     opens org.example.testfx.Ui to javafx.fxml;
+    exports org.example.testfx.Ui.Controllers;
+    opens org.example.testfx.Ui.Controllers to javafx.fxml;
 }

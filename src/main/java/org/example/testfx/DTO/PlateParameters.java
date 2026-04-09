@@ -8,6 +8,12 @@ public class PlateParameters {
     public PlateParameters() {
     }
 
+    public PlateParameters(NumeralInitialPlateParameters numeralParameters, String boundaryTemperatureEquationTop, String boundaryTemperatureEquationBottom) {
+        this.numeralParameters = numeralParameters;
+        this.boundaryTemperatureEquationTop = boundaryTemperatureEquationTop;
+        this.boundaryTemperatureEquationBottom = boundaryTemperatureEquationBottom;
+    }
+
     public void setNumeralParameters(NumeralInitialPlateParameters numeralParameters) {
         this.numeralParameters = numeralParameters;
     }
