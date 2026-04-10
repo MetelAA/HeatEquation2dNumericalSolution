@@ -5,6 +5,7 @@ module org.example.testfx {
     requires com.google.gson;
     requires org.apache.logging.log4j;
 
+
     opens org.example.testfx to javafx.fxml;
     opens org.example.testfx.DTO to com.google.gson;
 
@@ -14,4 +15,8 @@ module org.example.testfx {
     opens org.example.testfx.Ui to javafx.fxml;
     exports org.example.testfx.Ui.Controllers;
     opens org.example.testfx.Ui.Controllers to javafx.fxml;
+    exports org.example.testfx.HeatEquation.NumSolution;
+    opens org.example.testfx.HeatEquation.NumSolution to javafx.fxml;
+    exports org.example.testfx.HeatEquation.NumSolution.Equation;
+    opens org.example.testfx.HeatEquation.NumSolution.Equation to javafx.fxml;
 }

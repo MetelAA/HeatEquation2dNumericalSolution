@@ -3,18 +3,18 @@
     "numeralParameters": {
       "width": 1.0,
       "height": 1.0,
-      "density": 7600.0,
-      "heatCapacity": 600.0,
-      "heatConductivity": 200.0,
-      "plateTemperature": 55.0
+      "density": 2700.0,
+      "heatCapacity": 200.0,
+      "heatConductivity": 400.0,
+      "plateTemperature": 36.0
     },
-    "boundaryTemperatureEquationTop": "54880.89220355585*x - 378050.33345254266*x^2 + 893437.4794097745*x^3 - 879074.199334155*x^4 + 308533.16117336723*x^5",
-    "boundaryTemperatureEquationBottom": "(23*x)^2"
+    "boundaryTemperatureEquationTop": "10000*x - 40000*x^2 + 57270*x^3 - 34540*x^4 + 7270*x^5",
+    "boundaryTemperatureEquationBottom": "22*((2*x)^4)+55"
   },
   "simulationParameters": {
     "dt": 0.1,
     "dx": 0.1,
     "dy": 0.1,
-    "time": 10000
+    "time": 1000
   }
 }

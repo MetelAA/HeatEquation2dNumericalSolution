@@ -1,14 +1,14 @@
-package org.example.testfx.HeatEquation.NumSolution;
+package org.example.testfx.HeatEquation.NumSolution.Equation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
-import org.example.testfx.HeatEquation.NumSolution.executors.FirstHalfStepRunnable;
-import org.example.testfx.HeatEquation.NumSolution.executors.SecondHalfStepRunnable;
-import org.example.testfx.HeatEquation.NumSolution.executors.ThreadLocalDTO.ThreadVectors;
-import org.example.testfx.HeatEquation.NumSolution.matrix.ThreeDiagonalMatrixFirstStep;
-import org.example.testfx.HeatEquation.NumSolution.matrix.ThreeDiagonalMatrixSecondStep;
+import org.example.testfx.HeatEquation.NumSolution.Equation.executors.FirstHalfStepRunnable;
+import org.example.testfx.HeatEquation.NumSolution.Equation.executors.SecondHalfStepRunnable;
+import org.example.testfx.HeatEquation.NumSolution.Equation.executors.ThreadLocalDTO.ThreadVectors;
+import org.example.testfx.HeatEquation.NumSolution.Equation.matrix.ThreeDiagonalMatrixFirstStep;
+import org.example.testfx.HeatEquation.NumSolution.Equation.matrix.ThreeDiagonalMatrixSecondStep;
 import org.example.testfx.utils.ExpressionParser;
 
 import java.util.ArrayList;
@@ -24,9 +24,7 @@ import static java.lang.Math.pow;
 public class HeatEquationCore {
     private final static Logger log = LogManager.getLogger(HeatEquationCore.class);
 
-    private final PlateParameters plateParams;
 
-    private final double dx, dy, dt;
     private final int nx, ny;
     private final double rx, ry; //те самые r-ки
     private final double[][] tMap;
@@ -39,8 +37,6 @@ public class HeatEquationCore {
 
     public HeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
         log.debug("HeatEquationCore constructor start");
-        this.plateParams = plateParams;
-        this.dt = dtC;
 
         int acc;
         if ((acc = (int) (Math.floor(plateParams.getNumeralParameters().width() / dxC) + 1)) < 3) { //проверяем чтобы кол-во столбцов было больше > 3
@@ -48,14 +44,14 @@ public class HeatEquationCore {
             nx = 3;
         } else
             nx = acc;
-        dx = dxC;
+        double dx = dxC;
 
         if ((acc = ((int) Math.floor(plateParams.getNumeralParameters().height() / dyC) + 1)) < 3) { //проверяем чтобы кол-во строк было больше 3х
             dyC = (1.0 / 3.0) * plateParams.getNumeralParameters().height();
             ny = 3;
         } else
             ny = acc;
-        dy = dyC;
+        double dy = dyC;
 
 
         tMap = new double[ny][nx]; // инициализируем сетку температур
@@ -86,8 +82,8 @@ public class HeatEquationCore {
 
         //коэффициент температуропроводности, которые не теплопроводности, а который в r-ках
         double thermalDiffusivity = plateParams.getNumeralParameters().heatConductivity() / (plateParams.getNumeralParameters().density() * plateParams.getNumeralParameters().heatCapacity());
-        rx = (thermalDiffusivity * dt) / (2*pow(dx, 2));
-        ry = (thermalDiffusivity * dt) / (2*pow(dy, 2));
+        rx = (thermalDiffusivity * dtC) / (2*pow(dx, 2));
+        ry = (thermalDiffusivity * dtC) / (2*pow(dy, 2));
         //считаем неизменяемые матрицы для шагов метода прогонки
         firstStepMatrix = new ThreeDiagonalMatrixFirstStep(nx, rx);
         secondStepMatrix = new ThreeDiagonalMatrixSecondStep(ny - 2, ry);
@@ -117,7 +113,7 @@ public class HeatEquationCore {
                         new double[ny-2]
                 ));
 
-        executorService = Executors.newFixedThreadPool(Constants.threadCount);
+        executorService = Executors.newFixedThreadPool(Constants.THREAD_COUNT);
 
         log.info("HeatEquationCore initialized successfully");
     }

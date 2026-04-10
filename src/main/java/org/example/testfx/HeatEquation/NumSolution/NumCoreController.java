@@ -1,15 +1,20 @@
-package org.example.testfx;
+package org.example.testfx.HeatEquation.NumSolution;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
+import org.example.testfx.DTO.ExperimentParameters;
+import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
-import org.example.testfx.HeatEquation.NumSolution.HeatEquationCore;
-import org.example.testfx.utils.ReadWriteTemperatureMap;
+import org.example.testfx.HeatEquation.NumSolution.Equation.HeatEquationCore;
+import org.example.testfx.utils.TempMapWriter;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class NumCoreController {
     private final static Logger log = LogManager.getLogger(NumCoreController.class);
@@ -26,7 +31,7 @@ public class NumCoreController {
         log.info("CoreController initialized successfully");
     }
 
-    void run(){
+    public void run(){
         long startTime = System.currentTimeMillis();
         log.info("CoreController run");
         int nt = (int) (simulationParameters.getTime() / simulationParameters.getDt());
@@ -35,15 +40,40 @@ public class NumCoreController {
         log.info("Finally, total {} steps", nt*heatEquation.getNx()* heatEquation.getNy());
 
         int timeStepsPerSecond = (int) (1 / simulationParameters.getDt());
-        int timeStepsPerWrite = (int) (timeStepsPerSecond / Constants.writesPerSecond);
-        log.info("There are |{}| writes per second and there are |{}| time steps per second", Constants.writesPerSecond, timeStepsPerSecond);
-        log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double)(1.0/Constants.writesPerSecond));
+        int timeStepsPerWrite = (int) (timeStepsPerSecond / Constants.WRITES_PER_SECOND);
+        log.info("There are |{}| writes per second and there are |{}| time steps per second", Constants.WRITES_PER_SECOND, timeStepsPerSecond);
+        log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double)(1.0/Constants.WRITES_PER_SECOND));
         log.info("There will be |{}| total writes", nt / timeStepsPerWrite);
-        ReadWriteTemperatureMap mapIO = new ReadWriteTemperatureMap("test.txt");
+        TempMapWriter mapIO = new TempMapWriter();
         try {
             mapIO.initWriter();
         } catch (IOException e) {
             throw new RuntimeException("Exception while setting up data writer, with message: " + e);
+        }
+
+        {
+            double[][] heatMapFStep = heatEquation.gettMap();
+            double minT = Integer.MAX_VALUE, maxT = Integer.MIN_VALUE;
+            for (int i = 0; i < heatMapFStep.length; i++) {
+                for (int j = 0; j < heatMapFStep[0].length; j++) {
+                    minT = min(minT, heatMapFStep[i][j]);
+                    maxT = max(maxT, heatMapFStep[i][j]);
+                }
+            }
+            ExperimentalNMapParameters params = new ExperimentalNMapParameters(
+                    new ExperimentParameters(plateParameters, simulationParameters),
+                    minT,
+                    maxT,
+                    nt / timeStepsPerWrite,
+                    heatEquation.getNy(),
+                    heatEquation.getNx()
+            );
+            log.info("Writing experimental and temperature map parameters, toString: {}", params.toString());
+            try {
+                TempMapWriter.writeExperimentalNMapParameters(params);
+            } catch (IOException e) {
+                throw new RuntimeException("Exception while writing ExperimentalNMapParameters, with message: " + e);
+            }
         }
 
         // запись перед началом шагов, далее следующая запись через timeStepsPerWrite шагов!
@@ -63,15 +93,6 @@ public class NumCoreController {
                 }
             }
         }
-//        for (int i = 1; i <= nt; i++) {
-//            heatEquation.step();
-//
-//                try {
-//                    mapIO.writeMap(heatEquation.gettMap(), i);
-//                } catch (IOException e) {
-//                    throw new RuntimeException("Exception while writing step, with message: " + e);
-//                }
-//        }
 
         try {
             mapIO.closeWriter();

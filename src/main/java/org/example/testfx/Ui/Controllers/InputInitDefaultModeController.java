@@ -1,15 +1,13 @@
 package org.example.testfx.Ui.Controllers;
 
 import org.example.testfx.Constants.Constants;
+import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.Ui.Screen;
 import org.example.testfx.Ui.ScreenSwitcher;
-import org.example.testfx.Ui.screens.InitialBorderTemperatureBezierCurveScreen;
-import org.example.testfx.Ui.screens.InitialPlateParametersFormScreen;
-import org.example.testfx.Ui.screens.SelectBoundaryTemperatureSelectionTypeScreen;
-import org.example.testfx.Ui.screens.SimulationParameterSelectScreen;
+import org.example.testfx.Ui.screens.*;
 import org.example.testfx.utils.InitParametersFinishedCallback;
 
 import java.util.function.Consumer;
@@ -53,7 +51,10 @@ public class InputInitDefaultModeController implements Controller{
             step = 1;
             showCurrentStep();
         });
-        Screen screen = new InitialPlateParametersFormScreen(firstScreenConsumer);
+        Consumer<ExperimentParameters> shortCutLoad = (exParams -> {
+            callback.callback(exParams.getPlateParameters(), exParams.getSimulationParameters());
+        });
+        Screen screen = new InitialPlateParametersFormScreen(firstScreenConsumer, shortCutLoad);
         screenSwitcher.show(screen);
     }
 
@@ -78,8 +79,12 @@ public class InputInitDefaultModeController implements Controller{
     }
 
     private void showEquationEditor() {
-
-
+        InitialBorderTemperatureEquationEditor screen = new InitialBorderTemperatureEquationEditor(
+                plateParams.getNumeralParameters().width(),
+                Constants.MAX_TEMPERATURE, Constants.MIN_TEMPERATURE,
+                this::onBoundaryEquation
+        );
+        screenSwitcher.show(screen);
     }
 
     private void onBoundaryEquation(String equation) {

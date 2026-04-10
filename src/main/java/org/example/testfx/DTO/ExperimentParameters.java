@@ -19,4 +19,12 @@ public class ExperimentParameters {
     public SimulationParameters getSimulationParameters() {
         return simulationParameters;
     }
+
+    @Override
+    public String toString() {
+        return "ExperimentParameters{" +
+                "plateParameters=" + plateParameters +
+                ", simulationParameters=" + simulationParameters +
+                '}';
+    }
 }

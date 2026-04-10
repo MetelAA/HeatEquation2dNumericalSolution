@@ -3,13 +3,14 @@ package org.example.testfx.Ui.screens;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
 import org.example.testfx.Ui.Screen;
+import org.example.testfx.utils.ReadWriteNumericParamsFromFile;
 
+import java.io.FileNotFoundException;
 import java.util.function.Consumer;
 
 public class InitialPlateParametersFormScreen implements Screen {
@@ -17,10 +18,12 @@ public class InitialPlateParametersFormScreen implements Screen {
     final private BorderPane root;
     private NumeralInitialPlateParameters result;
     private final Consumer<NumeralInitialPlateParameters> callback;
+    private final Consumer<ExperimentParameters> shortCut;
 
 
-    public InitialPlateParametersFormScreen(Consumer<NumeralInitialPlateParameters> callback) {
+    public InitialPlateParametersFormScreen(Consumer<NumeralInitialPlateParameters> callback, Consumer<ExperimentParameters> shortCut) {
         this.callback = callback;
+        this.shortCut = shortCut;
         root = new BorderPane();
         VBox vertInputLayout = new VBox();
         vertInputLayout.setStyle("-fx-padding: 20; -fx-spacing: 15px;");
@@ -47,15 +50,30 @@ public class InitialPlateParametersFormScreen implements Screen {
         Text materialTemperatureCaption = new Text("Введите температуру плоскости (не включая граничные условия)");
         materialTemperatureTextField.setPromptText("Температура плоскости, °C");
         vertInputLayout.getChildren().addAll(materialTemperatureCaption, materialTemperatureTextField);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
         Button validateAllAndGoToTheNextScreen = new Button("Далее");
+
+        Button loadParamsFromFileBtn = new Button("Загрузить данные с предыдущего раза");
 
 
 
 
         Text errorText = new Text();
-
-
         errorText.setStyle("-fx-fill: red; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+
+        loadParamsFromFileBtn.setOnAction((eh) -> {
+            try {
+                shortCut.accept(ReadWriteNumericParamsFromFile.readSimulationParameters());
+            } catch (FileNotFoundException e) {
+                errorText.setText("Файл пуст");
+            }
+        });
+
+
         validateAllAndGoToTheNextScreen.setOnAction(e ->
             {
                 try{
@@ -77,7 +95,10 @@ public class InitialPlateParametersFormScreen implements Screen {
         buttonAndErrorBox.setStyle("-fx-spacing: 35px;");
         buttonAndErrorBox.getChildren().addAll(validateAllAndGoToTheNextScreen, errorText);
 
-        vertInputLayout.getChildren().add(buttonAndErrorBox);
+        HBox hbox = new HBox(buttonAndErrorBox, spacer, loadParamsFromFileBtn);
+
+
+        vertInputLayout.getChildren().add(hbox);
         root.setCenter(vertInputLayout);
 
     }
