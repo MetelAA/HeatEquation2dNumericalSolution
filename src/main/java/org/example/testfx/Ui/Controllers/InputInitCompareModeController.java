@@ -3,12 +3,13 @@ package org.example.testfx.Ui.Controllers;
 import org.example.testfx.Ui.ScreenSwitcher;
 import org.example.testfx.Ui.screens.InitialParamsForComparisonScreen;
 import org.example.testfx.utils.InitParametersFinishedCallback;
+import org.example.testfx.utils.InitParametersForCompareFinishedCallback;
 
 public class InputInitCompareModeController implements Controller{
     private final ScreenSwitcher switcher;
-    private final InitParametersFinishedCallback callback;
+    private final InitParametersForCompareFinishedCallback callback;
 
-    public InputInitCompareModeController(ScreenSwitcher switcher, InitParametersFinishedCallback callback) {
+    public InputInitCompareModeController(ScreenSwitcher switcher, InitParametersForCompareFinishedCallback callback) {
         this.switcher = switcher;
         this.callback = callback;
     }

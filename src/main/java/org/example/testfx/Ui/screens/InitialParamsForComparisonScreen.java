@@ -1,7 +1,9 @@
 package org.example.testfx.Ui.screens;
 
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -14,10 +16,11 @@ import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.Ui.Screen;
 import org.example.testfx.utils.InitParametersFinishedCallback;
+import org.example.testfx.utils.InitParametersForCompareFinishedCallback;
 
 public class InitialParamsForComparisonScreen implements Screen {
     private final BorderPane root;
-    private final InitParametersFinishedCallback callback;
+    private final InitParametersForCompareFinishedCallback callback;
 
     private final TextField widthTextField = new TextField();
     private final TextField heightTextField = new TextField();
@@ -32,78 +35,92 @@ public class InitialParamsForComparisonScreen implements Screen {
     private final TextField dyField = new TextField();
     private final TextField timeField = new TextField();
 
+    private final Text areaSizeCaption = new Text("Введите размеры плоскости:");
+    private final HBox areaSizeFields = new HBox();
+    private final Text materialPropertiesCaption = new Text("Введите характеристики материала:");
+    private final Text materialTemperatureCaption = new Text("Введите температуру плоскости (не включая граничные условия):");
+    private final Text materialTemperatureBottomCaption = new Text("Введите температуру плоскости снизу:");
+    private final Text materialTemperatureUpCaption = new Text("Введите температуру плоскости сверху:");
+    private final Text titleSim = new Text("Введите параметры симуляции:");
+    private final Text dtText = new Text("Введите шаг по времени, dt, сек:");
+    private final Text dxText = new Text("Введите шаг по горизонтали, dx, м:");
+    private final Text dyText = new Text("Введите шаг по вертикали, dy, м:");
+    private final Text timeText = new Text("Введите длину симуляции, time, сек:");
+    private final Text analyticalHormonicCountCaption = new Text("Введите количество гармоник в аналитическом решении:");
+    private final TextField analyticalHormonicCountTextField = new TextField();
+    private final Button nextButton = new Button("Далее");
+    private final Text errorText = new Text();
+    private final HBox buttonAndErrorBox = new HBox();
 
-    public InitialParamsForComparisonScreen(InitParametersFinishedCallback callback) {
+    public InitialParamsForComparisonScreen(InitParametersForCompareFinishedCallback callback) {
         root = new BorderPane();
         this.callback = callback;
-
 
         VBox mainLayout = new VBox();
         mainLayout.setStyle("-fx-padding: 20; -fx-spacing: 15px;");
 
-        Text areaSizeCaption = new Text("Введите размеры плоскости:");
-        HBox areaSizeFields = new HBox();
         areaSizeFields.setStyle("-fx-spacing: 25px;");
         widthTextField.setPromptText("Введите ширину, м");
         heightTextField.setPromptText("Введите высоту, м");
         areaSizeFields.getChildren().addAll(widthTextField, heightTextField);
 
-        Text materialPropertiesCaption = new Text("Введите характеристики материала:");
         densityTextField.setPromptText("Введите плотность вещества, кг/м^3");
         specificHeatCapacityTextField.setPromptText("Введите удельную теплоёмкость вещества, Дж/(кг*°К)");
         coefficientOfThermalConductivity.setPromptText("Введите коэффициент теплопроводности вещества, Вт/(м*°К)");
 
-        Text materialTemperatureCaption = new Text("Введите температуру плоскости (не включая граничные условия):");
         materialTemperatureTextField.setPromptText("Температура плоскости, °C");
-        Text materialTemperatureBottomCaption = new Text("Введите температуру плоскости снизу:");
         materialTemperatureBootomTextField.setPromptText("Температура плоскости снизу, °C");
-        Text materialTemperatureUpCaption = new Text("Введите температуру плоскости сверху:");
         materialTemperatureUpTextField.setPromptText("Температура плоскости сверху, °C");
 
-        Text titleSim = new Text("Введите параметры симуляции:");
-
-        Text dtText = new Text("Введите шаг по времени, dt, сек:");
         dtField.setPromptText("сек");
-
-        Text dxText = new Text("Введите шаг по горизонтали, dx, м:");
         dxField.setPromptText("м");
-
-        Text dyText = new Text("Введите шаг по вертикали, dy, м:");
         dyField.setPromptText("м");
-
-        Text timeText = new Text("Введите длину симуляции, time, сек:");
         timeField.setPromptText("сек");
 
+        analyticalHormonicCountTextField.setPromptText("кол-во гармоник");
 
-        Button nextButton = new Button("Далее");
-        Text errorText = new Text();
         errorText.setStyle("-fx-fill: red; -fx-font-weight: bold; -fx-font-size: 14px;");
 
-        HBox buttonAndErrorBox = new HBox();
         buttonAndErrorBox.setStyle("-fx-spacing: 35px;");
         buttonAndErrorBox.getChildren().addAll(nextButton, errorText);
 
         mainLayout.getChildren().addAll(
                 areaSizeCaption, areaSizeFields,
                 materialPropertiesCaption, densityTextField, specificHeatCapacityTextField, coefficientOfThermalConductivity,
-                materialTemperatureCaption, materialTemperatureTextField,
+                materialTemperatureCaption,
+                materialTemperatureTextField,
+                materialTemperatureBottomCaption,
+                materialTemperatureBootomTextField,
+                materialTemperatureUpCaption,
+                materialTemperatureUpTextField,
                 titleSim,
                 dtText, dtField,
                 dxText, dxField,
                 dyText, dyField,
                 timeText, timeField,
+                analyticalHormonicCountCaption, analyticalHormonicCountTextField,
                 buttonAndErrorBox
         );
 
-        root.setCenter(mainLayout);
+        HBox horizontalWrapper = new HBox(mainLayout);
+        horizontalWrapper.setAlignment(Pos.TOP_CENTER);
+        horizontalWrapper.setFillHeight(true);
+
+        ScrollPane scrollPane = new ScrollPane(horizontalWrapper);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        root.setCenter(scrollPane);
 
         nextButton.setOnAction(e -> {
             try {
                 NumeralInitialPlateParameters numPlateParams = validateAndCreatePlateParams();
                 SimulationParameters simParams = validateAndCreateSimulationParams();
                 Pair<String, String> bottomUpTemp = validateUpNBottomTemperature();
+                int hormonicCount = validateHormonicCount();
 
-                callback.callback(new PlateParameters(numPlateParams, bottomUpTemp.getValue(), bottomUpTemp.getKey()), simParams);
+                callback.callback(new PlateParameters(numPlateParams, bottomUpTemp.getValue(), bottomUpTemp.getKey()), simParams, hormonicCount);
                 errorText.setText("");
             } catch (Exception ex) {
                 errorText.setText(ex.getMessage());
@@ -121,6 +138,12 @@ public class InitialParamsForComparisonScreen implements Screen {
         if(upTemp < Constants.MIN_TEMPERATURE) throw new IllegalArgumentException("Температура не может быть ниже абсолютного нуля (-273.15°C)");
 
         return new Pair<>(Double.toString(bottomTemp), Double.toString(upTemp));
+    }
+
+    private int validateHormonicCount(){
+        long hormonicCount = fromStrToLong(analyticalHormonicCountTextField.getText(), "количество гармоник в разложении Фурье");
+        if (hormonicCount < 10 || hormonicCount > 100) throw new IllegalArgumentException("Количество гармоник должно находиться в диапазоне от 10 до 100");
+        return (int) hormonicCount;
     }
 
     private NumeralInitialPlateParameters validateAndCreatePlateParams() {

@@ -21,8 +21,8 @@ import java.util.concurrent.Future;
 
 import static java.lang.Math.pow;
 
-public class HeatEquationCore {
-    private final static Logger log = LogManager.getLogger(HeatEquationCore.class);
+public class NumHeatEquationCore {
+    private final static Logger log = LogManager.getLogger(NumHeatEquationCore.class);
 
 
     private final int nx, ny;
@@ -35,7 +35,7 @@ public class HeatEquationCore {
     private final ThreadLocal<ThreadVectors> threadLocalVectorsFirstStep, threadLocalVectorsSecondStep; // умные контейнеры для уменьшения расхода памяти (на один поток, коих конечное кол-во, выделяется по 3 массива единожды, при первом вызове метода get на ThreadLocal инстансе)
     private final ExecutorService executorService;
 
-    public HeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
+    public NumHeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
         log.debug("HeatEquationCore constructor start");
 
         int acc;

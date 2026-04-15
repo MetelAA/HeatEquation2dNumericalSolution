@@ -7,7 +7,7 @@ import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
-import org.example.testfx.HeatEquation.NumSolution.Equation.HeatEquationCore;
+import org.example.testfx.HeatEquation.NumSolution.Equation.NumHeatEquationCore;
 import org.example.testfx.utils.TempMapWriter;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import static java.lang.Math.min;
 
 public class NumCoreController {
     private final static Logger log = LogManager.getLogger(NumCoreController.class);
-    private final HeatEquationCore heatEquation;
+    private final NumHeatEquationCore heatEquation;
     private final PlateParameters plateParameters;
     private final SimulationParameters simulationParameters;
 
@@ -27,7 +27,7 @@ public class NumCoreController {
         this.simulationParameters = simulationParameters;
         log.debug("Setting up HeatEquationCore");
         log.debug("all parameters to string, |{}|, |{}|", plateParameters.toString(), simulationParameters.toString());
-        heatEquation = new HeatEquationCore(plateParameters, simulationParameters.getDx(), simulationParameters.getDy(), simulationParameters.getDt());
+        heatEquation = new NumHeatEquationCore(plateParameters, simulationParameters.getDx(), simulationParameters.getDy(), simulationParameters.getDt());
         log.info("CoreController initialized successfully");
     }
 
@@ -103,7 +103,7 @@ public class NumCoreController {
         log.info("All steps completed, time spent: {}m {}s", secs/60, secs% 60);
     }
 
-    public HeatEquationCore getHeatEquation() {
+    public NumHeatEquationCore getHeatEquation() {
         return heatEquation;
     }
 }

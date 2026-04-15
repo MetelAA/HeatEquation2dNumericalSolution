@@ -11,6 +11,7 @@ import org.example.testfx.Ui.Controllers.InputInitDefaultModeController;
 import org.example.testfx.Ui.Controllers.ModeSelectionController;
 import org.example.testfx.Ui.Controllers.OutputDefaultModeController;
 import org.example.testfx.Ui.ScreenSwitcher;
+import org.example.testfx.utils.InitParametersForCompareFinishedCallback;
 import org.example.testfx.utils.ReadWriteNumericParamsFromFile;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class MainApp extends Application {
     }
 
     private void startCompareNumAndAnalyticalMethods(){
-        InputInitCompareModeController controller = new InputInitCompareModeController(switcher, ((plateParams, simParams) -> {
+        InputInitCompareModeController controller = new InputInitCompareModeController(switcher, ((plateParams, simParams, hormonicCount) -> {
 
         })
         );
