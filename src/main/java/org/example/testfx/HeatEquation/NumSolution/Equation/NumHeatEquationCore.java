@@ -24,7 +24,7 @@ import static java.lang.Math.pow;
 public class NumHeatEquationCore {
     private final static Logger log = LogManager.getLogger(NumHeatEquationCore.class);
 
-
+    private final double dx, dy;
     private final int nx, ny;
     private final double rx, ry; //те самые r-ки
     private final double[][] tMap;
@@ -35,23 +35,22 @@ public class NumHeatEquationCore {
     private final ThreadLocal<ThreadVectors> threadLocalVectorsFirstStep, threadLocalVectorsSecondStep; // умные контейнеры для уменьшения расхода памяти (на один поток, коих конечное кол-во, выделяется по 3 массива единожды, при первом вызове метода get на ThreadLocal инстансе)
     private final ExecutorService executorService;
 
+
     public NumHeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
         log.debug("HeatEquationCore constructor start");
 
         int acc;
-        if ((acc = (int) (Math.floor(plateParams.getNumeralParameters().width() / dxC) + 1)) < 3) { //проверяем чтобы кол-во столбцов было больше > 3
-            dxC = (1.0 / 3.0) * plateParams.getNumeralParameters().width();
+        if ((acc = (int) (Math.round(plateParams.getNumeralParameters().width() / dxC))) < 3) { //проверяем чтобы кол-во столбцов было больше > 3
             nx = 3;
         } else
             nx = acc;
-        double dx = dxC;
+        dx = plateParams.getNumeralParameters().width() / nx;
 
-        if ((acc = ((int) Math.floor(plateParams.getNumeralParameters().height() / dyC) + 1)) < 3) { //проверяем чтобы кол-во строк было больше 3х
-            dyC = (1.0 / 3.0) * plateParams.getNumeralParameters().height();
+        if ((acc = ((int) Math.round(plateParams.getNumeralParameters().height() / dyC))) < 3) { //проверяем чтобы кол-во строк было больше 3х
             ny = 3;
         } else
             ny = acc;
-        double dy = dyC;
+        dy = plateParams.getNumeralParameters().height() / ny;
 
 
         tMap = new double[ny][nx]; // инициализируем сетку температур
@@ -60,7 +59,7 @@ public class NumHeatEquationCore {
         ExpressionParser.Expression expressionForTopBorder;
         ExpressionParser.Expression expressionForBottomBorder;
         try {
-            expressionForTopBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationTop());
+            expressionForTopBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationUp());
             expressionForBottomBorder = new ExpressionParser().compile(plateParams.getBoundaryTemperatureEquationBottom());
         } catch (ExpressionParser.ExpressionException e) {
             throw new RuntimeException("HeatEquationCore: expression parser setting up exception, with message: " + e);
@@ -163,5 +162,13 @@ public class NumHeatEquationCore {
 
     public int getNy() {
         return ny;
+    }
+
+    public double getDx() {
+        return dx;
+    }
+
+    public double getDy() {
+        return dy;
     }
 }

@@ -29,8 +29,8 @@ public class HeatmapComponent extends Pane {
 
     private final static int maxHeight = 600;
     private final static int maxWidth = 800;
-    private final static int minHeight = 200;
-    private final static int minWidth = 266;
+    private final static int minHeight = 60;
+    private final static int minWidth = 80;
 
     private static final Color[] GRADIENT_COLORS = {
             Color.BLUE, Color.CYAN, Color.GREEN, Color.YELLOW, Color.RED

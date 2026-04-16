@@ -3,18 +3,19 @@ package org.example.testfx.DTO;
 public class ExperimentalNMapParameters {
     private ExperimentParameters exParams;
     private double minTemp, maxTemp;
-    private int dt, ny, nx;
+    private int nt, ny, nx, wroteFramesCount;
 
     public ExperimentalNMapParameters() {
     }
 
-    public ExperimentalNMapParameters(ExperimentParameters exParams, double minTemp, double maxTemp, int dt, int ny, int nx) {
+    public ExperimentalNMapParameters(ExperimentParameters exParams, double minTemp, double maxTemp, int nt, int ny, int nx, int wroteFramesCount) {
         this.exParams = exParams;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
-        this.dt = dt;
+        this.nt = nt;
         this.ny = ny;
         this.nx = nx;
+        this.wroteFramesCount = wroteFramesCount;
     }
 
     public ExperimentParameters getExParams() {
@@ -29,8 +30,8 @@ public class ExperimentalNMapParameters {
         return maxTemp;
     }
 
-    public int getDt() {
-        return dt;
+    public int getNt() {
+        return nt;
     }
 
     public int getNy() {
@@ -41,15 +42,20 @@ public class ExperimentalNMapParameters {
         return nx;
     }
 
+    public int getWroteFramesCount() {
+        return wroteFramesCount;
+    }
+
     @Override
     public String toString() {
         return "ExperimentalNMapParameters{" +
                 "exParams=" + exParams +
                 ", minTemp=" + minTemp +
                 ", maxTemp=" + maxTemp +
-                ", dt=" + dt +
+                ", nt=" + nt +
                 ", ny=" + ny +
                 ", nx=" + nx +
+                ", wroteFramesCount=" + wroteFramesCount +
                 '}';
     }
 }

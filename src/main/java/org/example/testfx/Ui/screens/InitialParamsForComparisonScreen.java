@@ -142,7 +142,7 @@ public class InitialParamsForComparisonScreen implements Screen {
 
     private int validateHormonicCount(){
         long hormonicCount = fromStrToLong(analyticalHormonicCountTextField.getText(), "количество гармоник в разложении Фурье");
-        if (hormonicCount < 10 || hormonicCount > 100) throw new IllegalArgumentException("Количество гармоник должно находиться в диапазоне от 10 до 100");
+        if (hormonicCount < Constants.MIN_HARMONIC_COUNT || hormonicCount > Constants.MAX_HARMONIC_COUNT) throw new IllegalArgumentException("Количество гармоник должно находиться в диапазоне от " + Constants.MIN_HARMONIC_COUNT + " до " + Constants.MAX_HARMONIC_COUNT);
         return (int) hormonicCount;
     }
 

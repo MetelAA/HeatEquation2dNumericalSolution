@@ -2,16 +2,18 @@ package org.example.testfx;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.DTO.ExperimentParameters;
+import org.example.testfx.DTO.PlateParameters;
+import org.example.testfx.HeatEquation.AnalyticalSolution.AnalyticalCoreController;
 import org.example.testfx.HeatEquation.NumSolution.NumCoreController;
 import org.example.testfx.Ui.Controllers.InputInitCompareModeController;
 import org.example.testfx.Ui.Controllers.InputInitDefaultModeController;
 import org.example.testfx.Ui.Controllers.ModeSelectionController;
 import org.example.testfx.Ui.Controllers.OutputDefaultModeController;
 import org.example.testfx.Ui.ScreenSwitcher;
-import org.example.testfx.utils.InitParametersForCompareFinishedCallback;
 import org.example.testfx.utils.ReadWriteNumericParamsFromFile;
 
 import java.io.IOException;
@@ -44,7 +46,10 @@ public class MainApp extends Application {
             } catch (IOException e) {
                 throw new RuntimeException("Error when trying to write experimental parameters, with message: " + e);
             }
-            setUpCoreController(exParams);
+            Pair<Double, Double> dxdyChange = setUpNumCoreController(exParams);
+            //заменяем dxdy в параметрах эксперимента, тк потом те же параметры поедут в AnalyticalCore (здесь не поедут, но в любом случае, для консистентности)
+            exParams.getSimulationParameters().setDx(dxdyChange.getKey());
+            exParams.getSimulationParameters().setDy(dxdyChange.getValue());
             showResultsDefaultMode();
         })
         );
@@ -64,11 +69,18 @@ public class MainApp extends Application {
         controller.takeControl();
     }
 
-    private void setUpCoreController(ExperimentParameters params){
+    private Pair<Double, Double> setUpNumCoreController(ExperimentParameters params){ //возвращает изменённые (не факт что) dx и dy
         log.info("Setting up CoreController");
         NumCoreController numCoreController = new NumCoreController(params.getPlateParameters(), params.getSimulationParameters());
         log.info("Transfer control to CoreController");
         numCoreController.run();
+        return new Pair<>(params.getSimulationParameters().getDx(), params.getSimulationParameters().getDy());
+    }
+
+    private double[] setUpAndRunAnalyticalCoreController(PlateParameters plateParams, int hormonicCount, double dy, double time){
+        AnalyticalCoreController controller = new AnalyticalCoreController(plateParams, hormonicCount, dy);
+        controller.run(time);
+        return controller.getTMapColumn();
     }
 
 

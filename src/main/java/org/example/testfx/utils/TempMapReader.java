@@ -41,6 +41,9 @@ public class TempMapReader {
         }
         if (line == null) return null;
 
+        int frameNumber = extractFrameNumber(line);
+        log.debug("Reading frame number: |{}|", frameNumber);
+
         double[][] result = new double[rows][cols];
         for (int i = 0; i < rows; i++) {
             line = reader.readLine();
@@ -51,6 +54,26 @@ public class TempMapReader {
             }
         }
         return result;
+    }
+
+    private int extractFrameNumber(String headerLine) {
+        String numberStr = headerLine.replaceAll("-", "");
+        return Integer.parseInt(numberStr);
+    }
+
+    public void skipFrames(int n) throws IOException {
+        if (reader == null) initReader();
+
+        for (int i = 0; i < n; i++) {
+            String line;
+            while ((line = reader.readLine()) != null && !line.startsWith("---------")) {
+            }
+            if (line == null) break;
+
+            for (int r = 0; r < rows; r++) {
+                reader.readLine();
+            }
+        }
     }
 
     public void closeReader() throws IOException {

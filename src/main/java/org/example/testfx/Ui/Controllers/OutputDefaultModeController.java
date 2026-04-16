@@ -9,6 +9,7 @@ import org.example.testfx.utils.TempMapReader;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static java.lang.Math.ceil;
 
@@ -31,22 +32,31 @@ public class OutputDefaultModeController implements Controller{
     public void takeControl() {
 
         tMapReader = new TempMapReader(params.getNy(), params.getNx());
-        double[][] firstStep;
         try {
             tMapReader.initReader();
-            firstStep = tMapReader.readNextStep();
         } catch (IOException e) {
-            throw new RuntimeException("Error when reading heat map form file, with message: " + e);
+            throw new RuntimeException("Error when initializing heat map reader, with message: " + e);
         }
 
         log.debug(params);
 
         OutputDefaultModeScreen screen = new OutputDefaultModeScreen(
-                params.getExParams().getPlateParameters().getNumeralParameters().width(),
-                params.getExParams().getPlateParameters().getNumeralParameters().height(),
-                (ceil(params.getMinTemp() / 10.0) * 10),
-                (ceil(params.getMaxTemp() / 10.0) * 10),
-                firstStep);
+                params,
+                new Supplier<double[][]>() {
+                    @Override
+                    public double[][] get() {
+                        return getNextTMapFrame();
+                    }
+                }
+                );
         switcher.show(screen);
+    }
+
+    private double[][] getNextTMapFrame(){
+        try {
+            return tMapReader.readNextStep();
+        } catch (IOException e) {
+            throw new RuntimeException("Error when reading heat map form file, with message: " + e);
+        }
     }
 }

@@ -18,5 +18,7 @@ public class InputInitCompareModeController implements Controller{
     public void takeControl() {
         InitialParamsForComparisonScreen screen = new InitialParamsForComparisonScreen(callback);
         switcher.show(screen);
+
+
     }
 }

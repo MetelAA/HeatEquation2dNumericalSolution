@@ -2,15 +2,15 @@ package org.example.testfx.DTO;
 
 public class PlateParameters {
     private NumeralInitialPlateParameters numeralParameters;
-    private String boundaryTemperatureEquationTop;
+    private String boundaryTemperatureEquationUp;
     private String boundaryTemperatureEquationBottom;
 
     public PlateParameters() {
     }
 
-    public PlateParameters(NumeralInitialPlateParameters numeralParameters, String boundaryTemperatureEquationTop, String boundaryTemperatureEquationBottom) {
+    public PlateParameters(NumeralInitialPlateParameters numeralParameters, String boundaryTemperatureEquationUp, String boundaryTemperatureEquationBottom) {
         this.numeralParameters = numeralParameters;
-        this.boundaryTemperatureEquationTop = boundaryTemperatureEquationTop;
+        this.boundaryTemperatureEquationUp = boundaryTemperatureEquationUp;
         this.boundaryTemperatureEquationBottom = boundaryTemperatureEquationBottom;
     }
 
@@ -18,8 +18,8 @@ public class PlateParameters {
         this.numeralParameters = numeralParameters;
     }
 
-    public void setBoundaryTemperatureEquationTop(String boundaryTemperatureEquationTop) {
-        this.boundaryTemperatureEquationTop = boundaryTemperatureEquationTop;
+    public void setBoundaryTemperatureEquationUp(String boundaryTemperatureEquationUp) {
+        this.boundaryTemperatureEquationUp = boundaryTemperatureEquationUp;
     }
 
     public void setBoundaryTemperatureEquationBottom(String boundaryTemperatureEquationBottom) {
@@ -31,14 +31,14 @@ public class PlateParameters {
         return numeralParameters;
     }
 
-    public String getBoundaryTemperatureEquationTop() {
-        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null)
+    public String getBoundaryTemperatureEquationUp() {
+        if (numeralParameters == null || boundaryTemperatureEquationUp == null || boundaryTemperatureEquationBottom == null)
             throw new NullPointerException("one of fields is empty");
-        return boundaryTemperatureEquationTop;
+        return boundaryTemperatureEquationUp;
     }
 
     public String getBoundaryTemperatureEquationBottom() {
-        if (numeralParameters == null || boundaryTemperatureEquationTop == null || boundaryTemperatureEquationBottom == null)
+        if (numeralParameters == null || boundaryTemperatureEquationUp == null || boundaryTemperatureEquationBottom == null)
             throw new NullPointerException("one of fields is empty");
         return boundaryTemperatureEquationBottom;
     }
@@ -48,7 +48,7 @@ public class PlateParameters {
     public String toString() {
         return "InitialPlateParameters{" +
                 "numeralParameters=" + numeralParameters +
-                ", boundaryTemperatureEquationTop='" + boundaryTemperatureEquationTop + '\'' +
+                ", boundaryTemperatureEquationTop='" + boundaryTemperatureEquationUp + '\'' +
                 ", boundaryTemperatureEquationBottom='" + boundaryTemperatureEquationBottom + '\'' +
                 '}';
     }

@@ -89,7 +89,7 @@ public class InputInitDefaultModeController implements Controller{
 
     private void onBoundaryEquation(String equation) {
         if ("верхней".equals(pendingEdgeType))
-            plateParams.setBoundaryTemperatureEquationTop(equation);
+            plateParams.setBoundaryTemperatureEquationUp(equation);
         else
             plateParams.setBoundaryTemperatureEquationBottom(equation);
         step++;

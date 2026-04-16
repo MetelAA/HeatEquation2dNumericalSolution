@@ -1,0 +1,28 @@
+{
+  "exParams": {
+    "plateParameters": {
+      "numeralParameters": {
+        "width": 1.0,
+        "height": 1.0,
+        "density": 2670.0,
+        "heatCapacity": 0.921,
+        "heatConductivity": 203.0,
+        "plateTemperature": 22.0
+      },
+      "boundaryTemperatureEquationUp": "400",
+      "boundaryTemperatureEquationBottom": "2000"
+    },
+    "simulationParameters": {
+      "dt": 0.01,
+      "dx": 0.05,
+      "dy": 0.05,
+      "time": 10000
+    }
+  },
+  "minTemp": 22.0,
+  "maxTemp": 2000.0,
+  "nt": 1000,
+  "ny": 20,
+  "nx": 20,
+  "wroteFramesCount": 1000
+}
