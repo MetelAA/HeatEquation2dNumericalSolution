@@ -4,14 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.Ui.ScreenSwitcher;
-import org.example.testfx.Ui.screens.OutputDefaultModeScreen;
-import org.example.testfx.utils.TempMapReader;
+import org.example.testfx.Ui.Screens.OutputDefaultModeScreen;
+import org.example.testfx.Utils.FileUtils.TempMapReader;
+import org.example.testfx.Utils.FileUtils.TempMapReaderWrapper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.function.Supplier;
-
-import static java.lang.Math.ceil;
 
 public class OutputDefaultModeController implements Controller{
     private final static Logger log = LogManager.getLogger(OutputDefaultModeController.class);
@@ -38,25 +36,11 @@ public class OutputDefaultModeController implements Controller{
             throw new RuntimeException("Error when initializing heat map reader, with message: " + e);
         }
 
-        log.debug(params);
+        TempMapReaderWrapper readerWrapper = new TempMapReaderWrapper(tMapReader, params.getWroteFramesCount(), 1);
 
-        OutputDefaultModeScreen screen = new OutputDefaultModeScreen(
-                params,
-                new Supplier<double[][]>() {
-                    @Override
-                    public double[][] get() {
-                        return getNextTMapFrame();
-                    }
-                }
-                );
+
+        OutputDefaultModeScreen screen = new OutputDefaultModeScreen(readerWrapper, params);
         switcher.show(screen);
     }
 
-    private double[][] getNextTMapFrame(){
-        try {
-            return tMapReader.readNextStep();
-        } catch (IOException e) {
-            throw new RuntimeException("Error when reading heat map form file, with message: " + e);
-        }
-    }
 }

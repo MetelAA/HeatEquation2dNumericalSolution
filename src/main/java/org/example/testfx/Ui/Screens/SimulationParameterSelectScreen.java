@@ -1,6 +1,5 @@
-package org.example.testfx.Ui.screens;
+package org.example.testfx.Ui.Screens;
 
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;

@@ -1,4 +1,4 @@
-package org.example.testfx.Ui.screens;
+package org.example.testfx.Ui.Screens;
 
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -15,8 +15,7 @@ import org.example.testfx.DTO.NumeralInitialPlateParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.Ui.Screen;
-import org.example.testfx.utils.InitParametersFinishedCallback;
-import org.example.testfx.utils.InitParametersForCompareFinishedCallback;
+import org.example.testfx.Utils.InitParametersForCompareFinishedCallback;
 
 public class InitialParamsForComparisonScreen implements Screen {
     private final BorderPane root;

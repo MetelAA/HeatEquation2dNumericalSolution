@@ -1,4 +1,4 @@
-package org.example.testfx.utils;
+package org.example.testfx.Utils;
 
 import java.util.*;
 

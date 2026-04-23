@@ -7,8 +7,8 @@ import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.Ui.Screen;
 import org.example.testfx.Ui.ScreenSwitcher;
-import org.example.testfx.Ui.screens.*;
-import org.example.testfx.utils.InitParametersFinishedCallback;
+import org.example.testfx.Ui.Screens.*;
+import org.example.testfx.Utils.InitParametersFinishedCallback;
 
 import java.util.function.Consumer;
 

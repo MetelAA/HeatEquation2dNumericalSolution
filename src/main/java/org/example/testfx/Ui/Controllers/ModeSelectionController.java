@@ -1,7 +1,7 @@
 package org.example.testfx.Ui.Controllers;
 
 import org.example.testfx.Ui.ScreenSwitcher;
-import org.example.testfx.Ui.screens.ModeSelectionScreen;
+import org.example.testfx.Ui.Screens.ModeSelectionScreen;
 
 public class ModeSelectionController implements Controller{
     private final ScreenSwitcher screenSwitcher;

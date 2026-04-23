@@ -1,4 +1,4 @@
-package org.example.testfx.utils;
+package org.example.testfx.Utils.FileUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

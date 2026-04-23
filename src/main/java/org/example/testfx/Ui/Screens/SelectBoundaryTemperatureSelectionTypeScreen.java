@@ -1,4 +1,4 @@
-package org.example.testfx.Ui.screens;
+package org.example.testfx.Ui.Screens;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

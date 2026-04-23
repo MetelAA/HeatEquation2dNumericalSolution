@@ -1,4 +1,4 @@
-package org.example.testfx.utils;
+package org.example.testfx.Utils;
 
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;

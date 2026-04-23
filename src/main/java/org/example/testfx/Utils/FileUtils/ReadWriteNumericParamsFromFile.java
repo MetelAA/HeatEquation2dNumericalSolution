@@ -1,10 +1,9 @@
-package org.example.testfx.utils;
+package org.example.testfx.Utils.FileUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentParameters;
-import org.example.testfx.DTO.SimulationParameters;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

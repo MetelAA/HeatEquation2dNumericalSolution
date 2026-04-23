@@ -1,4 +1,4 @@
-package org.example.testfx.utils;
+package org.example.testfx.Utils.FileUtils;
 
 import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +14,7 @@ public class TempMapReader {
     private BufferedReader reader;
     private final int rows;
     private final int cols;
+    private int currentFrameNumber = -1;
 
     public TempMapReader(int rows, int cols) {
         this.rows = rows;
@@ -30,19 +31,18 @@ public class TempMapReader {
 
     public void initReader() throws IOException {
         reader = new BufferedReader(new FileReader(file));
+        currentFrameNumber = 0;
     }
 
-    public double[][] readNextStep() throws IOException {
+    public double[][] readNextFrame() throws IOException {
         if (reader == null) initReader();
 
         String line;
         while ((line = reader.readLine()) != null && !line.startsWith("---------")) {
-            // пропускаем мусор до заголовка
         }
         if (line == null) return null;
 
-        int frameNumber = extractFrameNumber(line);
-        log.debug("Reading frame number: |{}|", frameNumber);
+        currentFrameNumber = extractFrameNumber(line);
 
         double[][] result = new double[rows][cols];
         for (int i = 0; i < rows; i++) {
@@ -53,6 +53,7 @@ public class TempMapReader {
                 result[i][j] = Double.parseDouble(tokens[j]);
             }
         }
+
         return result;
     }
 
@@ -64,6 +65,7 @@ public class TempMapReader {
     public void skipFrames(int n) throws IOException {
         if (reader == null) initReader();
 
+        int skipped = 0;
         for (int i = 0; i < n; i++) {
             String line;
             while ((line = reader.readLine()) != null && !line.startsWith("---------")) {
@@ -71,9 +73,32 @@ public class TempMapReader {
             if (line == null) break;
 
             for (int r = 0; r < rows; r++) {
-                reader.readLine();
+                if (reader.readLine() == null) break;
             }
+            skipped++;
         }
+        currentFrameNumber += skipped;
+    }
+
+    public void goBackFrames(int n) throws IOException {
+        if (n <= 0) {
+            return;
+        }
+
+        int targetFrame = Math.max(0, currentFrameNumber - n);
+        if (reader != null) {
+            reader.close();
+            reader = null;
+        }
+
+        initReader();
+        if (targetFrame > 0) {
+            skipFrames(targetFrame);
+        }
+    }
+
+    public int getCurrentFrameNumber() {
+        return currentFrameNumber;
     }
 
     public void closeReader() throws IOException {

@@ -1,4 +1,4 @@
-package org.example.testfx.Ui.screens;
+package org.example.testfx.Ui.Screens;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -19,6 +19,7 @@ import org.example.testfx.Ui.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 /**
@@ -385,12 +386,11 @@ public class InitialBorderTemperatureBezierCurveScreen implements Screen {
         callback.accept(sb.toString());
     }
 
+
     private String formatNumber(double value) {
         if (Double.isNaN(value) || Double.isInfinite(value)) return "0";
-        String s = Double.toString(value);
-        if (s.contains(".")) {
-            s = s.replaceAll("0*$", "").replaceAll("\\.$", "");
-        }
+        String s = String.format(Locale.US, "%.15f", value);
+        s = s.replaceAll("0*$", "").replaceAll("\\.$", "");
         return s;
     }
 }

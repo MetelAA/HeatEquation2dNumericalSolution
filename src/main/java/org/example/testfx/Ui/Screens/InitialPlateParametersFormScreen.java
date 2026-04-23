@@ -1,4 +1,4 @@
-package org.example.testfx.Ui.screens;
+package org.example.testfx.Ui.Screens;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -8,7 +8,7 @@ import javafx.scene.text.Text;
 import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
 import org.example.testfx.Ui.Screen;
-import org.example.testfx.utils.ReadWriteNumericParamsFromFile;
+import org.example.testfx.Utils.FileUtils.ReadWriteNumericParamsFromFile;
 
 import java.io.FileNotFoundException;
 import java.util.function.Consumer;

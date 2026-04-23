@@ -1,4 +1,4 @@
-package org.example.testfx.Ui.screens;
+package org.example.testfx.Ui.Screens;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.example.testfx.Ui.Screen;
-import org.example.testfx.utils.ExpressionParser;
+import org.example.testfx.Utils.ExpressionParser;
 
 import java.util.function.Consumer;
 

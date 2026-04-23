@@ -8,7 +8,7 @@ import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.HeatEquation.NumSolution.Equation.NumHeatEquationCore;
-import org.example.testfx.utils.TempMapWriter;
+import org.example.testfx.Utils.FileUtils.TempMapWriter;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -37,13 +37,13 @@ public class NumCoreController {
         int nt = (int) (simulationParameters.getTime() / simulationParameters.getDt());
 
         log.info("There are |{}| time steps,  |{}| x steps, |{}| y steps", nt, heatEquation.getNx(), heatEquation.getNy());
-        log.info("Finally, total {} steps", nt * heatEquation.getNx() * heatEquation.getNy());
+        log.info("Finally, total {} steps", (long)nt * heatEquation.getNx() * heatEquation.getNy());
 
         int timeStepsPerSecond = (int) (1 / simulationParameters.getDt());
-        int timeStepsPerWrite = (int) (timeStepsPerSecond / Constants.WRITES_PER_SECOND);
-        log.info("There are |{}| writes per second and there are |{}| time steps per second", Constants.WRITES_PER_SECOND, timeStepsPerSecond);
-        log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double) (1.0 / Constants.WRITES_PER_SECOND));
-        log.info("There will be |{}| total writes", nt / timeStepsPerWrite);
+        int timeStepsPerWrite = (int) (timeStepsPerSecond / Constants.WRITE_FRAME_PER_SECOND);
+        log.info("There are |{}| writes per second and there are |{}| time steps per second", Constants.WRITE_FRAME_PER_SECOND, timeStepsPerSecond);
+        log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double) (1.0 / Constants.WRITE_FRAME_PER_SECOND));
+        log.info("There will be |{}| total writes/frames", nt / timeStepsPerWrite + 1); //+1 тк одна запись на 0ой кадр
         TempMapWriter mapIO = new TempMapWriter();
         try {
             mapIO.initWriter();
@@ -104,7 +104,8 @@ public class NumCoreController {
                 new ExperimentParameters(plateParameters, simulationParameters),
                 minT,
                 maxT,
-                nt / timeStepsPerWrite,
+                Constants.WRITE_FRAME_PER_SECOND,
+                nt,
                 heatEquation.getNy(),
                 heatEquation.getNx(),
                 nt / timeStepsPerWrite

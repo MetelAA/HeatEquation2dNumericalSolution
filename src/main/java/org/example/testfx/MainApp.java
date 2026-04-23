@@ -14,7 +14,7 @@ import org.example.testfx.Ui.Controllers.InputInitDefaultModeController;
 import org.example.testfx.Ui.Controllers.ModeSelectionController;
 import org.example.testfx.Ui.Controllers.OutputDefaultModeController;
 import org.example.testfx.Ui.ScreenSwitcher;
-import org.example.testfx.utils.ReadWriteNumericParamsFromFile;
+import org.example.testfx.Utils.FileUtils.ReadWriteNumericParamsFromFile;
 
 import java.io.IOException;
 

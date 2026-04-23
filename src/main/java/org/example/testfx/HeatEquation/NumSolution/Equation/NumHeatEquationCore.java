@@ -4,12 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.PlateParameters;
-import org.example.testfx.HeatEquation.NumSolution.Equation.executors.FirstHalfStepRunnable;
-import org.example.testfx.HeatEquation.NumSolution.Equation.executors.SecondHalfStepRunnable;
-import org.example.testfx.HeatEquation.NumSolution.Equation.executors.ThreadLocalDTO.ThreadVectors;
+import org.example.testfx.HeatEquation.NumSolution.Equation.Executors.FirstHalfStepRunnable;
+import org.example.testfx.HeatEquation.NumSolution.Equation.Executors.SecondHalfStepRunnable;
+import org.example.testfx.HeatEquation.NumSolution.Equation.Executors.ThreadLocalDTO.ThreadVectors;
 import org.example.testfx.HeatEquation.NumSolution.Equation.matrix.ThreeDiagonalMatrixFirstStep;
 import org.example.testfx.HeatEquation.NumSolution.Equation.matrix.ThreeDiagonalMatrixSecondStep;
-import org.example.testfx.utils.ExpressionParser;
+import org.example.testfx.Utils.ExpressionParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
