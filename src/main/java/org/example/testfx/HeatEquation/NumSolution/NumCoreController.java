@@ -2,7 +2,6 @@ package org.example.testfx.HeatEquation.NumSolution;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.DTO.PlateParameters;
@@ -40,9 +39,9 @@ public class NumCoreController {
         log.info("Finally, total {} steps", (long)nt * heatEquation.getNx() * heatEquation.getNy());
 
         int timeStepsPerSecond = (int) (1 / simulationParameters.getDt());
-        int timeStepsPerWrite = (int) (timeStepsPerSecond / Constants.WRITE_FRAME_PER_SECOND);
-        log.info("There are |{}| writes per second and there are |{}| time steps per second", Constants.WRITE_FRAME_PER_SECOND, timeStepsPerSecond);
-        log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double) (1.0 / Constants.WRITE_FRAME_PER_SECOND));
+        int timeStepsPerWrite = (int) (timeStepsPerSecond / simulationParameters.getFrameWritesPerSecond());
+        log.info("There are |{}| writes per second and there are |{}| time steps per second", simulationParameters.getFrameWritesPerSecond(), timeStepsPerSecond);
+        log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double) (1.0 / simulationParameters.getFrameWritesPerSecond()));
         log.info("There will be |{}| total writes/frames", nt / timeStepsPerWrite + 1); //+1 тк одна запись на 0ой кадр
         TempMapWriter mapIO = new TempMapWriter();
         try {
@@ -81,6 +80,7 @@ public class NumCoreController {
             }
         }
 
+        heatEquation.shutdownThreadPool();
         try {
             mapIO.closeWriter();
         } catch (IOException e) {
@@ -104,7 +104,6 @@ public class NumCoreController {
                 new ExperimentParameters(plateParameters, simulationParameters),
                 minT,
                 maxT,
-                Constants.WRITE_FRAME_PER_SECOND,
                 nt,
                 heatEquation.getNy(),
                 heatEquation.getNx(),

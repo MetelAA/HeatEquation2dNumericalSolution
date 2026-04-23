@@ -5,25 +5,25 @@
         "width": 0.1,
         "height": 0.1,
         "density": 2200.0,
-        "heatCapacity": 220.0,
+        "heatCapacity": 200.0,
         "heatConductivity": 2.0,
-        "plateTemperature": 20.0
+        "plateTemperature": 22.0
       },
-      "boundaryTemperatureEquationUp": "5000*x+60",
-      "boundaryTemperatureEquationBottom": "600-5000*x"
+      "boundaryTemperatureEquationUp": "1173715.3652392942*x^2 - 35211460.95717882*x^3 + 352114609.57178825*x^4 - 1173715365.239294*x^5",
+      "boundaryTemperatureEquationBottom": "200"
     },
     "simulationParameters": {
       "dt": 0.1,
-      "dx": 0.005,
-      "dy": 0.005,
-      "time": 5000
+      "dx": 0.01,
+      "dy": 0.01,
+      "time": 1000,
+      "frameWritesPerSecond": 1.0
     }
   },
-  "minTemp": 20.0,
-  "maxTemp": 600.0,
-  "writeFramesPerSeconds": 0.1,
-  "nt": 50000,
-  "ny": 20,
-  "nx": 20,
-  "wroteFramesCount": 500
+  "minTemp": 0.0,
+  "maxTemp": 405.6360302267001,
+  "nt": 10000,
+  "ny": 10,
+  "nx": 10,
+  "wroteFramesCount": 1000
 }

@@ -2,17 +2,16 @@ package org.example.testfx.DTO;
 
 public class ExperimentalNMapParameters {
     private ExperimentParameters exParams;
-    private double minTemp, maxTemp, writeFramesPerSeconds;
+    private double minTemp, maxTemp;
     private int nt, ny, nx, wroteFramesCount;
 
     public ExperimentalNMapParameters() {
     }
 
-    public ExperimentalNMapParameters(ExperimentParameters exParams, double minTemp, double maxTemp, double writeFramesPerSeconds, int nt, int ny, int nx, int wroteFramesCount) {
+    public ExperimentalNMapParameters(ExperimentParameters exParams, double minTemp, double maxTemp, int nt, int ny, int nx, int wroteFramesCount) {
         this.exParams = exParams;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
-        this.writeFramesPerSeconds = writeFramesPerSeconds;
         this.nt = nt;
         this.ny = ny;
         this.nx = nx;
@@ -35,10 +34,6 @@ public class ExperimentalNMapParameters {
         return nt;
     }
 
-    public double getWriteFramesPerSeconds() {
-        return writeFramesPerSeconds;
-    }
-
     public int getNy() {
         return ny;
     }
@@ -57,7 +52,6 @@ public class ExperimentalNMapParameters {
                 "exParams=" + exParams +
                 ", minTemp=" + minTemp +
                 ", maxTemp=" + maxTemp +
-                ", writeFramesPerSeconds=" + writeFramesPerSeconds +
                 ", nt=" + nt +
                 ", ny=" + ny +
                 ", nx=" + nx +

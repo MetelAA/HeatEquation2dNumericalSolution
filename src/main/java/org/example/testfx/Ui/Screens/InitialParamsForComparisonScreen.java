@@ -33,6 +33,7 @@ public class InitialParamsForComparisonScreen implements Screen {
     private final TextField dxField = new TextField();
     private final TextField dyField = new TextField();
     private final TextField timeField = new TextField();
+    private final TextField framesWritesField = new TextField();
 
     private final Text areaSizeCaption = new Text("Введите размеры плоскости:");
     private final HBox areaSizeFields = new HBox();
@@ -45,6 +46,7 @@ public class InitialParamsForComparisonScreen implements Screen {
     private final Text dxText = new Text("Введите шаг по горизонтали, dx, м:");
     private final Text dyText = new Text("Введите шаг по вертикали, dy, м:");
     private final Text timeText = new Text("Введите длину симуляции, time, сек:");
+    private final Text framesWriteText = new Text("Введите количество записываемы кадров в секунду, от числа стремящегося к нулю до 1 (осторожно с этим параметром, может нагенирить файл на 200гб за 10минут)");
     private final Text analyticalHormonicCountCaption = new Text("Введите количество гармоник в аналитическом решении:");
     private final TextField analyticalHormonicCountTextField = new TextField();
     private final Button nextButton = new Button("Далее");
@@ -83,6 +85,8 @@ public class InitialParamsForComparisonScreen implements Screen {
         buttonAndErrorBox.setStyle("-fx-spacing: 35px;");
         buttonAndErrorBox.getChildren().addAll(nextButton, errorText);
 
+        framesWritesField.setText(String.valueOf(Constants.WRITE_FRAME_PER_SECOND));
+
         mainLayout.getChildren().addAll(
                 areaSizeCaption, areaSizeFields,
                 materialPropertiesCaption, densityTextField, specificHeatCapacityTextField, coefficientOfThermalConductivity,
@@ -97,6 +101,7 @@ public class InitialParamsForComparisonScreen implements Screen {
                 dxText, dxField,
                 dyText, dyField,
                 timeText, timeField,
+                framesWriteText, framesWritesField,
                 analyticalHormonicCountCaption, analyticalHormonicCountTextField,
                 buttonAndErrorBox
         );
@@ -169,13 +174,16 @@ public class InitialParamsForComparisonScreen implements Screen {
         double dx = fromStrToDouble(dxField.getText(), "dx");
         double dy = fromStrToDouble(dyField.getText(), "dy");
         long time = fromStrToLong(timeField.getText(), "time");
+        double framesPerSec = fromStrToDouble(framesWritesField.getText(), "frames per second");
 
         if (dt <= 0) throw new IllegalArgumentException("dt должен быть положительным числом, но получено: " + dt);
         if (dx <= 0) throw new IllegalArgumentException("dx должен быть положительным числом, но получено: " + dx);
         if (dy <= 0) throw new IllegalArgumentException("dy должен быть положительным числом, но получено: " + dy);
         if (time < 0) throw new IllegalArgumentException("time не может быть отрицательным, но получено: " + time);
+        if(framesPerSec > 1 || framesPerSec <= 0) throw new IllegalArgumentException("frames pre second должно быть в полуинтервале (0, 1], но получено: " + framesPerSec);
 
-        return new SimulationParameters(dt, dx, dy, time);
+
+        return new SimulationParameters(dt, dx, dy, time, framesPerSec);
     }
 
     private double fromStrToDouble(String str, String fieldName) {

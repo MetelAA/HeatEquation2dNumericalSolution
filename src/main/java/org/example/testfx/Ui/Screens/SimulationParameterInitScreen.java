@@ -7,17 +7,18 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.Ui.Screen;
 
 import java.util.function.Consumer;
 
-public class SimulationParameterSelectScreen implements Screen {
+public class SimulationParameterInitScreen implements Screen {
 
     private final BorderPane root;
     private final Consumer<SimulationParameters> callback;
 
-    public SimulationParameterSelectScreen(Consumer<SimulationParameters> callback) {
+    public SimulationParameterInitScreen(Consumer<SimulationParameters> callback) {
         this.callback = callback;
         root = new BorderPane();
 
@@ -27,6 +28,7 @@ public class SimulationParameterSelectScreen implements Screen {
         Text dxText = new Text("Введите шаг по горизонтали, dx, м:");
         Text dyText = new Text("Введите шаг по вертикали, dy, м:");
         Text timeText = new Text("Введите длину симуляции, time, сек:");
+        Text framesWriteText = new Text("Введите количество записываемы кадров в секунду, от числа стремящегося к нулю до 1 (осторожно с этим параметром, может нагенирить файл на 200гб за 10минут)");
 
         TextField dtField = new TextField();
         dtField.setPromptText("сек");
@@ -36,6 +38,9 @@ public class SimulationParameterSelectScreen implements Screen {
         dyField.setPromptText("м");
         TextField timeField = new TextField();
         timeField.setPromptText("сек");
+        TextField framesWritesField = new TextField();
+        framesWritesField.setText(String.valueOf(Constants.WRITE_FRAME_PER_SECOND));
+
 
         Text errorText = new Text();
         errorText.setStyle("-fx-fill: red; -fx-font-weight: bold; -fx-font-size: 14px;");
@@ -50,7 +55,8 @@ public class SimulationParameterSelectScreen implements Screen {
                             dtField.getText(),
                             dxField.getText(),
                             dyField.getText(),
-                            timeField.getText()
+                            timeField.getText(),
+                            framesWritesField.getText()
                     ));
                 } catch (IllegalArgumentException ex){
                     errorText.setText(ex.getMessage());
@@ -58,7 +64,7 @@ public class SimulationParameterSelectScreen implements Screen {
             }
         );
 
-        vl.getChildren().addAll(dtText, dtField, dxText, dxField, dyText, dyField, timeText, timeField);
+        vl.getChildren().addAll(dtText, dtField, dxText, dxField, dyText, dyField, timeText, timeField, framesWriteText, framesWritesField);
 
         HBox buttonAndErrorBox = new HBox();
         buttonAndErrorBox.getChildren().addAll(validateBtn, errorText);
@@ -71,11 +77,12 @@ public class SimulationParameterSelectScreen implements Screen {
         root.setCenter(vl);
     }
 
-    private SimulationParameters validateParameters(String dtStr, String dxStr, String dyStr, String timeStr) throws IllegalArgumentException, NumberFormatException {
+    private SimulationParameters validateParameters(String dtStr, String dxStr, String dyStr, String timeStr, String framesPerSecStr) throws IllegalArgumentException, NumberFormatException {
         double dt = fromStrToDouble(dtStr, "dt");
         double dx = fromStrToDouble(dxStr, "dx");
         double dy = fromStrToDouble(dyStr, "dy");
         long time = fromStrToLong(timeStr, "time");
+        double framesPerSec = fromStrToDouble(framesPerSecStr, "frames per second");
 
         if (dt <= 0)
             throw new IllegalArgumentException("dt должен быть положительным числом, но получено: " + dt);
@@ -88,8 +95,10 @@ public class SimulationParameterSelectScreen implements Screen {
 
         if (time < 0)
             throw new IllegalArgumentException("time не может быть отрицательным, но получено: " + time);
+        if(framesPerSec > 1 || framesPerSec <= 0)
+            throw new IllegalArgumentException("frames pre second должно быть в полуинтервале (0, 1], но получено: " + framesPerSec);
 
-        return new SimulationParameters(dt, dx, dy, time);
+        return new SimulationParameters(dt, dx, dy, time, framesPerSec);
     }
 
     private double fromStrToDouble(String str, String fieldName) throws NumberFormatException{

@@ -171,4 +171,8 @@ public class NumHeatEquationCore {
     public double getDy() {
         return dy;
     }
+
+    public void shutdownThreadPool(){
+        executorService.shutdown();
+    }
 }

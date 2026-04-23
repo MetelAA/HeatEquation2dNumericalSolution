@@ -4,6 +4,7 @@ module org.example.testfx {
     requires javafx.graphics;
     requires com.google.gson;
     requires org.apache.logging.log4j;
+    requires javafx.base;
 
 
     opens org.example.testfx to javafx.fxml;

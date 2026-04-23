@@ -97,7 +97,7 @@ public class InputInitDefaultModeController implements Controller{
     }
 
     private void showSimulationScreen() {
-        SimulationParameterSelectScreen screen = new SimulationParameterSelectScreen(params -> {
+        SimulationParameterInitScreen screen = new SimulationParameterInitScreen(params -> {
             simParams = params;
             step = 4;
             showCurrentStep();
