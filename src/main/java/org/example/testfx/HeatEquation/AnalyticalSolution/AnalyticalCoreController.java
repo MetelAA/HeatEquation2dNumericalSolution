@@ -18,23 +18,23 @@ public class AnalyticalCoreController { // тут в отличие от чис�
     private final int harmonicCount;
     private final ExperimentParameters exParams;
     private final AnalyticalHeatEquationCore equation;
+    private final int nx, ny;
 
     public AnalyticalCoreController(ExperimentParameters params, int harmonicCount) {  //dt здесь и в NumCoreController это разные dt, там это параметр эксперимента, здесь - шаг по времени, который зависит от частоты записи кадров в численном методе
         this.harmonicCount = harmonicCount;
         this.exParams = params;
         log.debug("setting up AnalyticalHeatEquationCore");
         log.debug("all parameters to string: |{}|, harmonic count: |{}|, dy: |{}|", params.toString(), harmonicCount, exParams.getSimulationParameters().getDy());
-        equation = new AnalyticalHeatEquationCore(params.getPlateParameters(), harmonicCount, exParams.getSimulationParameters().getDy());
+
+        nx = Math.max((int) Math.round(exParams.getPlateParameters().getNumeralParameters().width() / exParams.getSimulationParameters().getDx()) + 1, 3);
+        ny = Math.max((int) Math.round(exParams.getPlateParameters().getNumeralParameters().height() / exParams.getSimulationParameters().getDy()) + 1, 3);
+        equation = new AnalyticalHeatEquationCore(params.getPlateParameters(), harmonicCount, ny, exParams.getSimulationParameters().getDy());
         log.info("AnalyticalController initialized successfully");
     }
 
     public void run(){
         log.info("AnalyticalController run start! there will be |{}| steps", exParams.getSimulationParameters().getTime()/ exParams.getSimulationParameters().getFrameWritesPerSecond());
 
-
-
-        int nx = Math.max((int) Math.round(exParams.getPlateParameters().getNumeralParameters().width() / exParams.getSimulationParameters().getDx()) + 1, 3);
-        int ny = Math.max((int) Math.round(exParams.getPlateParameters().getNumeralParameters().height() / exParams.getSimulationParameters().getDy()) + 1, 3);
 
         TempMapWriter mapI = new TempMapWriter(Constants.TEMP_MAP_FOR_ANALYTICAL_METHOD_FILE_LOCATION);
         try {
