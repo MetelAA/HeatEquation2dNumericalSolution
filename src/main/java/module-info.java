@@ -7,6 +7,7 @@ module org.example.testfx {
     requires javafx.base;
 
 
+
     opens org.example.testfx to javafx.fxml;
     opens org.example.testfx.DTO to com.google.gson;
 

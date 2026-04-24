@@ -14,8 +14,8 @@ public class TempMapWriter {
     private final File file;
     private BufferedWriter writer;
 
-    public TempMapWriter() {
-        file = new File(Constants.TEMP_MAP_FILE_LOCATION);
+    public TempMapWriter(String filePath) {
+        file = new File(filePath);
         log.debug("TempMapWriter успешно создан, запись будет проводиться в {}", file.getAbsolutePath());
     }
 

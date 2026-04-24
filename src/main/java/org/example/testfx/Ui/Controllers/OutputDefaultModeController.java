@@ -2,6 +2,7 @@ package org.example.testfx.Ui.Controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.Ui.ScreenSwitcher;
 import org.example.testfx.Ui.Screens.OutputDefaultModeScreen;
@@ -29,7 +30,7 @@ public class OutputDefaultModeController implements Controller{
     @Override
     public void takeControl() {
 
-        tMapReader = new TempMapReader(params.getNy(), params.getNx());
+        tMapReader = new TempMapReader(params.getNy(), params.getNx(), Constants.TEMP_MAP_FOR_NUM_METHOD_FILE_LOCATION);
         try {
             tMapReader.initReader();
         } catch (IOException e) {

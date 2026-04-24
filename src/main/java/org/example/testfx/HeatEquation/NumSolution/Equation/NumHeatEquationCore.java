@@ -39,18 +39,14 @@ public class NumHeatEquationCore {
     public NumHeatEquationCore(PlateParameters plateParams, double dxC, double dyC, double dtC) {
         log.debug("HeatEquationCore constructor start");
 
-        int acc;
-        if ((acc = (int) (Math.round(plateParams.getNumeralParameters().width() / dxC))) < 3) { //проверяем чтобы кол-во столбцов было больше > 3
-            nx = 3;
-        } else
-            nx = acc;
-        dx = plateParams.getNumeralParameters().width() / nx;
+        //проверяем чтобы кол-во столбцов было больше > 3
+        int accX = (int) Math.round(plateParams.getNumeralParameters().width() / dxC) + 1;
+        nx = Math.max(accX, 3);
+        dx = plateParams.getNumeralParameters().width() / (nx - 1);
 
-        if ((acc = ((int) Math.round(plateParams.getNumeralParameters().height() / dyC))) < 3) { //проверяем чтобы кол-во строк было больше 3х
-            ny = 3;
-        } else
-            ny = acc;
-        dy = plateParams.getNumeralParameters().height() / ny;
+        int accY = (int) Math.round(plateParams.getNumeralParameters().height() / dyC) + 1;
+        ny = Math.max(accY, 3);
+        dy = plateParams.getNumeralParameters().height() / (ny - 1);
 
 
         tMap = new double[ny][nx]; // инициализируем сетку температур

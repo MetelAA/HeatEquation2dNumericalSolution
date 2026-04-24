@@ -2,6 +2,7 @@ package org.example.testfx.HeatEquation.NumSolution;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.DTO.PlateParameters;
@@ -43,7 +44,7 @@ public class NumCoreController {
         log.info("There are |{}| writes per second and there are |{}| time steps per second", simulationParameters.getFrameWritesPerSecond(), timeStepsPerSecond);
         log.info("There are |{}| time steps per write => write will be done once every |{}| secs", timeStepsPerWrite, (double) (1.0 / simulationParameters.getFrameWritesPerSecond()));
         log.info("There will be |{}| total writes/frames", nt / timeStepsPerWrite + 1); //+1 тк одна запись на 0ой кадр
-        TempMapWriter mapIO = new TempMapWriter();
+        TempMapWriter mapIO = new TempMapWriter(Constants.TEMP_MAP_FOR_NUM_METHOD_FILE_LOCATION);
         try {
             mapIO.initWriter();
         } catch (IOException e) {

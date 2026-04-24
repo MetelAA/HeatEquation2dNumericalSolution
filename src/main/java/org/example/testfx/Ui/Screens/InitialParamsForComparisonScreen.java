@@ -126,7 +126,7 @@ public class InitialParamsForComparisonScreen implements Screen {
 
                 callback.callback(new PlateParameters(numPlateParams, bottomUpTemp.getValue(), bottomUpTemp.getKey()), simParams, hormonicCount);
                 errorText.setText("");
-            } catch (Exception ex) {
+            } catch (IllegalArgumentException ex) {
                 errorText.setText(ex.getMessage());
             }
         });

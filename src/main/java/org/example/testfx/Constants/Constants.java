@@ -7,7 +7,8 @@ public class Constants {
     public final static String workMod = "debug"; //prod || debug
     public final static double WRITE_FRAME_PER_SECOND = 0.1;
     public final static String PARAMS_FILE_LOCATION = "params.json";
-    public final static String TEMP_MAP_FILE_LOCATION = "result.txt";
+    public final static String TEMP_MAP_FOR_NUM_METHOD_FILE_LOCATION = "result_num.txt";
+    public final static String TEMP_MAP_FOR_ANALYTICAL_METHOD_FILE_LOCATION = "result_analytical.txt";
     public final static String TEMP_MAP_PARAMS_FILE_LOCATION = "result_params.json";
     public final static int MIN_HARMONIC_COUNT = 10;
     public final static int MAX_HARMONIC_COUNT = 100;

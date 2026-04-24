@@ -1,5 +1,6 @@
 package org.example.testfx.Ui.Component;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -8,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
@@ -36,7 +38,7 @@ public class HeatmapPlayerComponent extends VBox {
     private int fps = Constants.DEFAULT_FPS;
 
     // Фиксированная ширина для числовых полей, чтобы текст не сдвигал соседей
-    private static final double FIXED_VALUE_WIDTH = 80;
+    private static final double FIXED_VALUE_WIDTH = 130;
 
     public HeatmapPlayerComponent(TempMapReaderWrapper framesSupplier, ExperimentalNMapParameters params) {
         this.framesSupplier = framesSupplier;
@@ -57,13 +59,16 @@ public class HeatmapPlayerComponent extends VBox {
         {
             VBox timeStepAndTimeInfo = new VBox(5);
             Text timeStepInfoText = new Text();
+            Text timeWriteStepText = new Text();
             // Форматирование double до двух знаков
-            timeStepInfoText.setText(String.format("%.2f сек", params.getExParams().getSimulationParameters().getDt()));
-            actualTimeInfoText.setText(String.format("%.2f сек", 0.0));
+            timeStepInfoText.setText(String.format("dt: %.2f сек", params.getExParams().getSimulationParameters().getDt()));
+            timeWriteStepText.setText(String.format("Кадр зап. раз в %.2f сек", 1.0 / params.getExParams().getSimulationParameters().getFrameWritesPerSecond()));
+            actualTimeInfoText.setText(String.format("Тек. время: %.2f сек", 0.0));
 
             // Оборачиваем Text в контейнер с фиксированной шириной
             timeStepAndTimeInfo.getChildren().addAll(
                     wrapWithFixedWidth(timeStepInfoText),
+                    wrapWithFixedWidth(timeWriteStepText),
                     wrapWithFixedWidth(actualTimeInfoText)
             );
             controlPanel.getChildren().add(timeStepAndTimeInfo);
@@ -105,7 +110,7 @@ public class HeatmapPlayerComponent extends VBox {
 
                         double currentTime = framesSupplier.getCurrentFrameNumber() / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
                         Platform.runLater(() -> {
-                            actualTimeInfoText.setText(String.format("%.2f сек", currentTime));
+                            actualTimeInfoText.setText(String.format("тек. время: %.2f сек", currentTime));
                             if (frame.isEmpty()) {
                                 playPauseBtn.setText("pause");
                                 playPauseBtn.setDisable(true);
@@ -155,14 +160,25 @@ public class HeatmapPlayerComponent extends VBox {
     }
 
     public void toEndBtnClick(ActionEvent actionEvent) {
-        try {
-            framesSupplier.setPointerToLastFrame();
-        } catch (IOException e) {
-            throw new RuntimeException("OutputDefaultModeScreen: error when setting fileReader pointer before last frame, with error: " + e);
-        }
+        playPauseBtn.fire();
 
-        double currentTime = (framesSupplier.getCurrentFrameNumber() + 1) / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
-        actualTimeInfoText.setText(String.format("%.2f сек", currentTime));
+        PauseTransition delay1 = new PauseTransition(Duration.millis(100));
+        delay1.setOnFinished(e -> {
+            try {
+                framesSupplier.setPointerToLastFrame();
+            } catch (IOException ex) {
+                throw new RuntimeException("OutputDefaultModeScreen: error when setting fileReader pointer before last frame, with error: " + ex);
+            }
+
+            PauseTransition delay2 = new PauseTransition(Duration.millis(50));
+            delay2.setOnFinished(e2 -> {
+                playPauseBtn.fire();
+                double currentTime = (framesSupplier.getCurrentFrameNumber() + 1) / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
+                actualTimeInfoText.setText(String.format("тек. время: %.2f сек", currentTime));
+            });
+            delay2.play();
+        });
+        delay1.play();
     }
 
     public void changeStepMultiplierChoiceBox(ActionEvent actionEvent) {

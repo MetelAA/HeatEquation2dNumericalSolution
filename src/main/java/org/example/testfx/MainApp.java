@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.PlateParameters;
+import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.HeatEquation.AnalyticalSolution.AnalyticalCoreController;
 import org.example.testfx.HeatEquation.NumSolution.NumCoreController;
 import org.example.testfx.Ui.Controllers.InputInitCompareModeController;
@@ -39,6 +40,7 @@ public class MainApp extends Application {
     }
 
     private void startDefaultMode(){
+        log.info("");
         InputInitDefaultModeController controller = new InputInitDefaultModeController(switcher, ((plateParams, simParams) -> {
             exParams = new ExperimentParameters(plateParams, simParams);
             try {
@@ -57,16 +59,30 @@ public class MainApp extends Application {
     }
 
     private void startCompareNumAndAnalyticalMethods(){
-        InputInitCompareModeController controller = new InputInitCompareModeController(switcher, ((plateParams, simParams, hormonicCount) -> {
+        try{
+            InputInitCompareModeController controller = new InputInitCompareModeController(switcher, ((plateParams, simParams, hormonicCount) -> {
+                exParams = new ExperimentParameters(plateParams, simParams);
 
-        })
-        );
-        controller.takeControl();
+                Pair<Double, Double> dxdyChange = setUpNumCoreController(exParams);
+                //заменяем dxdy в параметрах эксперимента, тк потом те же параметры поедут в AnalyticalCore (здесь не поедут, но в любом случае, для консистентности)
+                exParams.getSimulationParameters().setDx(dxdyChange.getKey());
+                exParams.getSimulationParameters().setDy(dxdyChange.getValue());
+                setUpAndRunAnalyticalCoreController(hormonicCount);
+            })
+            );
+            controller.takeControl();
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     private void showResultsDefaultMode(){
         OutputDefaultModeController controller = new OutputDefaultModeController(switcher);
         controller.takeControl();
+    }
+
+    private void showResultCompareMod(){
+
     }
 
     private Pair<Double, Double> setUpNumCoreController(ExperimentParameters params){ //возвращает изменённые (не факт что) dx и dy
@@ -77,10 +93,9 @@ public class MainApp extends Application {
         return new Pair<>(params.getSimulationParameters().getDx(), params.getSimulationParameters().getDy());
     }
 
-    private double[] setUpAndRunAnalyticalCoreController(PlateParameters plateParams, int hormonicCount, double dy, double time){
-        AnalyticalCoreController controller = new AnalyticalCoreController(plateParams, hormonicCount, dy);
-        controller.run(time);
-        return controller.getTMapColumn();
+    private void setUpAndRunAnalyticalCoreController(int hormonicCount){
+        AnalyticalCoreController controller = new AnalyticalCoreController(exParams, hormonicCount);
+        controller.run();
     }
 
 

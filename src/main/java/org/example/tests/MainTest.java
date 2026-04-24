@@ -1,5 +1,6 @@
 package org.example.tests;
 
+import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentalNMapParameters;
 import org.example.testfx.Utils.FileUtils.TempMapReader;
 import org.example.testfx.Utils.FileUtils.TempMapReaderWrapper;
@@ -16,7 +17,7 @@ public class MainTest {
             throw new RuntimeException(e);
         }
 
-        TempMapReader reader = new TempMapReader(params.getNy(), params.getNx());
+        TempMapReader reader = new TempMapReader(params.getNy(), params.getNx(), Constants.TEMP_MAP_FOR_NUM_METHOD_FILE_LOCATION);
         reader.initReader();
 
         TempMapReaderWrapper wrap = new TempMapReaderWrapper(reader, params.getWroteFramesCount(), 1);

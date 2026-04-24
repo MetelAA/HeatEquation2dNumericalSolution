@@ -135,7 +135,6 @@ public class HeatmapComponent extends Pane {
         gc.fillText(String.format("%.1f", maxTemp), gradWidth / 2, 15);
         gc.fillText(String.format("%.1f", minTemp), gradWidth / 2, gradHeight - 10);
 
-        // обводка
         gc.setStroke(Color.GRAY);
         gc.strokeRect(0, 0, gradWidth, gradHeight);
     }
@@ -164,11 +163,11 @@ public class HeatmapComponent extends Pane {
             }
         } else {
             if (minWidth > maxWidthByHeight) {
-                // Случай А: изображение слишком широкое -> упираемся в minWidth и maxHeight
+                // Случай А: изображение слишком широкое => упираемся в minWidth и maxHeight
                 newWidth = (int) minWidth;
                 newHeight = (int) maxHeight;
             } else if (minWidthByHeight > maxWidth) {
-                // Случай Б: изображение слишком узкое -> упираемся в maxWidth и minHeight
+                // Случай Б: изображение слишком узкое => упираемся в maxWidth и minHeight
                 newWidth = (int) maxWidth;
                 newHeight = (int) minHeight;
             } else {

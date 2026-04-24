@@ -16,10 +16,10 @@ public class TempMapReader {
     private final int cols;
     private int currentFrameNumber = -1;
 
-    public TempMapReader(int rows, int cols) {
+    public TempMapReader(int rows, int cols, String filePath) {
         this.rows = rows;
         this.cols = cols;
-        file = new File(Constants.TEMP_MAP_FILE_LOCATION);
+        file = new File(filePath);
         log.info("TempMapReader успешно создан, чтение будет проводиться из {}", file.getAbsolutePath());
     }
 
