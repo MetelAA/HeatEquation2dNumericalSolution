@@ -1,0 +1,1 @@
+java -jar target/testFX-1.0-SNAPSHOT.jar
