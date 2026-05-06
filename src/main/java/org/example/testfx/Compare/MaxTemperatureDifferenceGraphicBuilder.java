@@ -1,5 +1,7 @@
 package org.example.testfx.Compare;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.Utils.FileUtils.GNUPlotGraphicsWriter;
@@ -11,15 +13,10 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class MaxTemperatureDifferenceGraphicBuilder {
+    private final static Logger log = LogManager.getLogger(MaxTemperatureDifferenceGraphicBuilder.class);
 
-    public void buildGraphic() {
-        ExperimentNMapParameters params;
-        try {
-            params = TempMapReader.getParams();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Error when reading ex params from file, with message: " + e);
-        }
-
+    public void buildGraphic(ExperimentNMapParameters params) {
+        log.info("MaxTemperatureDifferenceGraphicBuilder start data processing");
         TempMapReaderWrapper numReaderWrapper;
         TempMapReaderWrapper analyticalReaderWrapper;
         {
@@ -48,13 +45,13 @@ public class MaxTemperatureDifferenceGraphicBuilder {
 
         try {
             GNUPlotGraphicsWriter writer = new GNUPlotGraphicsWriter();
-            writer.initWriter(Constants.AVERAGE_QUAD_TEMPERATURE_GRAPHIC_DATA_FILE_LOCATION);
+            writer.initWriter(Constants.MAX_TEMPERATURE_DIFFERENCE_GRAPHIC_DATA_FILE_LOCATION);
             writer.writeData(maxDif, timestamps);
             writer.closeWriter();
         } catch (IOException e) {
             throw new RuntimeException("Error when writing max diff data to file, with message: " + e);
         }
-
+        log.info("MaxTemperatureDifferenceGraphicBuilder successfully wrote all data");
     }
 
     private double getMaxDif(double[][] fTMap, double[][] sTMap){ //разность будем всегда брать по модулю

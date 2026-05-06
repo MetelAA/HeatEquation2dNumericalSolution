@@ -262,4 +262,11 @@ public class HeatmapPlayerComponent extends VBox {
         STATIC_GRADIENT,
         DYNAMIC_GRADIENT
     }
+
+    public void stopThreads(){
+        if(playbackThread != null)
+            playbackThread.interrupt();
+        if (temperatureLimitsChecker != null)
+            temperatureLimitsChecker.stopExecutor();
+    }
 }

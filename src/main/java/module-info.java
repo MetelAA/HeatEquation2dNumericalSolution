@@ -5,7 +5,6 @@ module org.example.testfx {
     requires com.google.gson;
     requires org.apache.logging.log4j;
     requires javafx.base;
-    requires org.example.testfx;
 
 
     opens org.example.testfx to javafx.fxml;

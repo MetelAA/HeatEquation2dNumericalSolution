@@ -16,7 +16,7 @@
       "dt": 0.1,
       "dx": 0.01,
       "dy": 0.01,
-      "time": 10000,
+      "time": 1000,
       "frameWritesPerSecond": 0.1
     }
   },

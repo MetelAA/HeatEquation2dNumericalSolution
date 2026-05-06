@@ -15,14 +15,12 @@ public class OutputDefaultModeScreen implements Screen {
 
     public OutputDefaultModeScreen(TempMapReaderWrapper framesSupplier, ExperimentNMapParameters params) {
         root = new BorderPane();
-        log.info("starting ");
+        log.info("starting");
 
         HeatmapPlayerComponent playerComponent = new HeatmapPlayerComponent(framesSupplier, params, HeatmapPlayerComponent.HeatmapPlayerComponentWorkMods.STATIC_GRADIENT);
 
         root.setCenter(playerComponent);
     }
-
-
 
 
 

@@ -68,4 +68,8 @@ public class HeatmapGradientTemperatureDynamicLimitsChecker {
 
         });
     }
+
+    public void stopExecutor(){
+        executor.shutdown();
+    }
 }

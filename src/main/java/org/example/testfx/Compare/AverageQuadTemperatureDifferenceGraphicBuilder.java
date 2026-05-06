@@ -1,5 +1,7 @@
 package org.example.testfx.Compare;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.Utils.FileUtils.GNUPlotGraphicsWriter;
@@ -11,14 +13,9 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class AverageQuadTemperatureDifferenceGraphicBuilder {
-    public void buildGraphic() {
-        ExperimentNMapParameters params;
-        try {
-            params = TempMapReader.getParams();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Error when reading ex params from file, with message: " + e);
-        }
-
+    private final static Logger log = LogManager.getLogger(AverageQuadTemperatureDifferenceGraphicBuilder.class);
+    public void buildGraphic(ExperimentNMapParameters params) {
+        log.info("AverageQuadTemperatureDifferenceGraphicBuilder start data processing");
         TempMapReaderWrapper numReaderWrapper;
         TempMapReaderWrapper analyticalReaderWrapper;
         {
@@ -55,6 +52,7 @@ public class AverageQuadTemperatureDifferenceGraphicBuilder {
         } catch (IOException e) {
             throw new RuntimeException("Error when writing avg quad diff data to file, with message: " + e);
         }
+        log.info("AverageQuadTemperatureDifferenceGraphicBuilder successfully wrote all data");
 
     }
 

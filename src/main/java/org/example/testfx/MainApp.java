@@ -5,18 +5,20 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.testfx.Compare.AverageQuadTemperatureDifferenceGraphicBuilder;
+import org.example.testfx.Compare.MaxTemperatureDifferenceGraphicBuilder;
 import org.example.testfx.DTO.CompareNExperimentParameters;
+import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.DTO.ExperimentParameters;
-import org.example.testfx.DTO.PlateParameters;
-import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.Exceptions.ParameterFileParseException;
 import org.example.testfx.HeatEquation.AnalyticalSolution.AnalyticalCoreController;
 import org.example.testfx.HeatEquation.NumSolution.NumCoreController;
 import org.example.testfx.Ui.Controllers.*;
 import org.example.testfx.Ui.ScreenSwitcher;
 import org.example.testfx.Utils.FileUtils.ReadWriteNumericParamsFromFile;
+import org.example.testfx.Utils.FileUtils.TempMapReader;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 
 public class MainApp extends Application {
@@ -71,12 +73,17 @@ public class MainApp extends Application {
                     }
                 }
 
+                //запускаем контроллер численного решения
                 Pair<Double, Double> dxdyChange = setUpNumCoreController(exParams);
                 //заменяем dxdy в параметрах эксперимента, тк потом те же параметры поедут в AnalyticalCore
                 exParams.getSimulationParameters().setDx(dxdyChange.getKey());
                 exParams.getSimulationParameters().setDy(dxdyChange.getValue());
+                //запускаем контроллер аналитического решения
                 setUpAndRunAnalyticalCoreController(exParams, hormonicCount);
-                compareAnalyticalAndNumMethodResultRepresentation();
+                //запускаем построителей датасета для графиков ошибок
+                setUpAndRunDifferenceGraphicsBuilders();
+
+                showRezOfCompareAnalyticalAndNumMethod();
             })
             );
             controller.takeControl();
@@ -85,8 +92,23 @@ public class MainApp extends Application {
         }
     }
 
+    private void setUpAndRunDifferenceGraphicsBuilders() {
+        //сначала прочитаем файл с записанными параметрами экспериментов с предыдущих шагов
+        ExperimentNMapParameters params;
+        try {
+            params = TempMapReader.getParams();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Error when reading ex params from file, with message: " + e);
+        }
 
-    private void compareAnalyticalAndNumMethodResultRepresentation(){
+        MaxTemperatureDifferenceGraphicBuilder maxDiffGraphicBuilder = new MaxTemperatureDifferenceGraphicBuilder();
+        AverageQuadTemperatureDifferenceGraphicBuilder avgQuadDiffGraphicsBuilder = new AverageQuadTemperatureDifferenceGraphicBuilder();
+        maxDiffGraphicBuilder.buildGraphic(params);
+        avgQuadDiffGraphicsBuilder.buildGraphic(params);
+    }
+
+
+    private void showRezOfCompareAnalyticalAndNumMethod(){
         OutputCompareModController controller = new OutputCompareModController(switcher);
         controller.takeControl();
     }

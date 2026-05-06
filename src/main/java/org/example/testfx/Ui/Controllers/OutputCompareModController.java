@@ -11,7 +11,7 @@ import org.example.testfx.Utils.FileUtils.TempMapReader;
 import org.example.testfx.Utils.FileUtils.TempMapReaderWrapper;
 import org.example.testfx.Utils.TempMapsComparator;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 
 public class OutputCompareModController implements Controller{
     private final static Logger log = LogManager.getLogger(OutputDefaultModeController.class);
@@ -58,10 +58,24 @@ public class OutputCompareModController implements Controller{
             @Override
             public void callback() {
 
+                showGraphic("max_diff.plot");
+                showGraphic("avg_quad_diff.plot");
             }
         });
 
         switcher.show(firstScreen);
+    }
+    private void showGraphic(String plotScriptFileName) {
+        try {
+            new ProcessBuilder(
+                    "cmd", "/c", "start", "gnuplot", plotScriptFileName
+            )
+                    .directory(new File("C:\\Users\\Artem\\ideaProj\\HeatEquation2dNumericalSolution"))
+                    .start();
+            // Не ждём завершения, окно живёт само по себе
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
