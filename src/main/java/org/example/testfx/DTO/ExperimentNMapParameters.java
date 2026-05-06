@@ -1,14 +1,14 @@
 package org.example.testfx.DTO;
 
-public class ExperimentalNMapParameters {
+public class ExperimentNMapParameters {
     private ExperimentParameters exParams;
     private double minTemp, maxTemp;
     private int nt, ny, nx, wroteFramesCount;
 
-    public ExperimentalNMapParameters() {
+    public ExperimentNMapParameters() {
     }
 
-    public ExperimentalNMapParameters(ExperimentParameters exParams, double minTemp, double maxTemp, int nt, int ny, int nx, int wroteFramesCount) {
+    public ExperimentNMapParameters(ExperimentParameters exParams, double minTemp, double maxTemp, int nt, int ny, int nx, int wroteFramesCount) {
         this.exParams = exParams;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;

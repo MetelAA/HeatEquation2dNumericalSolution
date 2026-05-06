@@ -3,7 +3,7 @@ package org.example.testfx.Ui.Controllers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
-import org.example.testfx.DTO.ExperimentalNMapParameters;
+import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.Ui.ScreenSwitcher;
 import org.example.testfx.Ui.Screens.OutputDefaultModeScreen;
 import org.example.testfx.Utils.FileUtils.TempMapReader;
@@ -15,7 +15,7 @@ import java.io.IOException;
 public class OutputDefaultModeController implements Controller{
     private final static Logger log = LogManager.getLogger(OutputDefaultModeController.class);
     private final ScreenSwitcher switcher;
-    private final ExperimentalNMapParameters params;
+    private final ExperimentNMapParameters params;
     private TempMapReader tMapReader;
 
     public OutputDefaultModeController(ScreenSwitcher switcher) {

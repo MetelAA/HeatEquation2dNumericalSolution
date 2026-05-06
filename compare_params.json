@@ -20,10 +20,5 @@
       "frameWritesPerSecond": 0.1
     }
   },
-  "minTemp": 5.0,
-  "maxTemp": 99.0,
-  "nt": 100000,
-  "ny": 11,
-  "nx": 11,
-  "wroteFramesCount": 1000
+  "hormonicCount": 45
 }

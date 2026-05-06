@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
 import org.example.testfx.DTO.ExperimentParameters;
-import org.example.testfx.DTO.ExperimentalNMapParameters;
+import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
 import org.example.testfx.HeatEquation.NumSolution.Equation.NumHeatEquationCore;
@@ -52,7 +52,7 @@ public class NumCoreController {
         }
 
 
-        ExperimentalNMapParameters params = getExperimentalNMapParameters(nt, timeStepsPerWrite);
+        ExperimentNMapParameters params = getExperimentalNMapParameters(nt, timeStepsPerWrite);
         log.info("Writing experimental and temperature map parameters, toString: {}", params.toString());
         try {
             TempMapWriter.writeExperimentalNMapParameters(params);
@@ -91,7 +91,7 @@ public class NumCoreController {
         log.info("All steps completed, time spent: {}m {}s", secs / 60, secs % 60);
     }
 
-    private ExperimentalNMapParameters getExperimentalNMapParameters(int nt, int timeStepsPerWrite) {
+    private ExperimentNMapParameters getExperimentalNMapParameters(int nt, int timeStepsPerWrite) {
         double[][] heatMapFStep = heatEquation.gettMap(); // определить максимальную и минимальную темпу можно до рассчётов, тк очев не выше не ниже она не станет
         double minT = Integer.MAX_VALUE, maxT = Integer.MIN_VALUE;
         for (int i = 0; i < heatMapFStep.length; i++) {
@@ -101,7 +101,7 @@ public class NumCoreController {
             }
         }
 
-        ExperimentalNMapParameters params = new ExperimentalNMapParameters(
+        ExperimentNMapParameters params = new ExperimentNMapParameters(
                 new ExperimentParameters(plateParameters, simulationParameters),
                 minT,
                 maxT,

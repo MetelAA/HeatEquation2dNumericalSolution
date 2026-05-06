@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
-import org.example.testfx.DTO.ExperimentalNMapParameters;
+import org.example.testfx.DTO.ExperimentNMapParameters;
 
 import java.io.*;
 
@@ -23,10 +23,10 @@ public class TempMapReader {
         log.info("TempMapReader успешно создан, чтение будет проводиться из {}", file.getAbsolutePath());
     }
 
-    public static ExperimentalNMapParameters getParams() throws FileNotFoundException {
+    public static ExperimentNMapParameters getParams() throws FileNotFoundException {
         FileReader paramReader = new FileReader(Constants.TEMP_MAP_PARAMS_FILE_LOCATION);
         Gson gson = new Gson();
-        return gson.fromJson(paramReader, ExperimentalNMapParameters.class);
+        return gson.fromJson(paramReader, ExperimentNMapParameters.class);
     }
 
     public void initReader() throws IOException {

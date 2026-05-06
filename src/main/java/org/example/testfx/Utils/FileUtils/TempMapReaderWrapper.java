@@ -1,9 +1,11 @@
 package org.example.testfx.Utils.FileUtils;
 
+import org.example.testfx.Utils.TempMapDataProducer;
+
 import java.io.IOException;
 import java.util.Optional;
 
-public class TempMapReaderWrapper {
+public class TempMapReaderWrapper implements TempMapDataProducer {
     private final TempMapReader reader;
     private final int frameCount;
     private int frameStepMultiplier;

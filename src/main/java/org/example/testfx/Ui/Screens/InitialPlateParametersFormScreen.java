@@ -7,6 +7,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
+import org.example.testfx.Exceptions.ParameterFileParseException;
 import org.example.testfx.Ui.Screen;
 import org.example.testfx.Utils.FileUtils.ReadWriteNumericParamsFromFile;
 
@@ -68,8 +69,8 @@ public class InitialPlateParametersFormScreen implements Screen {
         loadParamsFromFileBtn.setOnAction((eh) -> {
             try {
                 shortCut.accept(ReadWriteNumericParamsFromFile.readSimulationParameters());
-            } catch (FileNotFoundException e) {
-                errorText.setText("Файл пуст");
+            } catch (ParameterFileParseException e) {
+                errorText.setText("Ошибка парсинга файла!");
             }
         });
 

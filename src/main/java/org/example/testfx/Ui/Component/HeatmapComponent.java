@@ -18,8 +18,8 @@ import org.apache.logging.log4j.Logger;
 
 public class HeatmapComponent extends Pane {
     private final static Logger log = LogManager.getLogger(HeatmapComponent.class);
-    private final double minTemp;
-    private final double maxTemp;
+    private double minTemp;
+    private double maxTemp;
     private double[][] currentFrame;
     private final Canvas tMap;
     private final Canvas gradient;
@@ -188,4 +188,12 @@ public class HeatmapComponent extends Pane {
         double localT = (t - idx * segment) / segment;
         return GRADIENT_COLORS[idx].interpolate(GRADIENT_COLORS[idx + 1], localT);
     }
+
+    public void changeGradientAndTempLimits(double nMinTemp, double nMaxTemp){
+        this.minTemp = nMinTemp;
+        this.maxTemp = nMaxTemp;
+        Platform.runLater(this::drawGradient);
+    }
+
+
 }

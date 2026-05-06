@@ -5,15 +5,14 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.testfx.DTO.CompareNExperimentParameters;
 import org.example.testfx.DTO.ExperimentParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
+import org.example.testfx.Exceptions.ParameterFileParseException;
 import org.example.testfx.HeatEquation.AnalyticalSolution.AnalyticalCoreController;
 import org.example.testfx.HeatEquation.NumSolution.NumCoreController;
-import org.example.testfx.Ui.Controllers.InputInitCompareModeController;
-import org.example.testfx.Ui.Controllers.InputInitDefaultModeController;
-import org.example.testfx.Ui.Controllers.ModeSelectionController;
-import org.example.testfx.Ui.Controllers.OutputDefaultModeController;
+import org.example.testfx.Ui.Controllers.*;
 import org.example.testfx.Ui.ScreenSwitcher;
 import org.example.testfx.Utils.FileUtils.ReadWriteNumericParamsFromFile;
 
@@ -45,7 +44,7 @@ public class MainApp extends Application {
             exParams = new ExperimentParameters(plateParams, simParams);
             try {
                 ReadWriteNumericParamsFromFile.writeSimulationParameters(exParams);
-            } catch (IOException e) {
+            } catch (ParameterFileParseException e) {
                 throw new RuntimeException("Error when trying to write experimental parameters, with message: " + e);
             }
             Pair<Double, Double> dxdyChange = setUpNumCoreController(exParams);
@@ -63,11 +62,21 @@ public class MainApp extends Application {
             InputInitCompareModeController controller = new InputInitCompareModeController(switcher, ((plateParams, simParams, hormonicCount) -> {
                 exParams = new ExperimentParameters(plateParams, simParams);
 
+                //запишем в файл для шорткатов
+                {
+                    try {
+                        ReadWriteNumericParamsFromFile.writeCompareParameters(new CompareNExperimentParameters(exParams, hormonicCount));
+                    } catch (ParameterFileParseException e) {
+                        throw new RuntimeException("Error when trying to write data for shortcut in compare mod, with message: " + e);
+                    }
+                }
+
                 Pair<Double, Double> dxdyChange = setUpNumCoreController(exParams);
-                //заменяем dxdy в параметрах эксперимента, тк потом те же параметры поедут в AnalyticalCore (здесь не поедут, но в любом случае, для консистентности)
+                //заменяем dxdy в параметрах эксперимента, тк потом те же параметры поедут в AnalyticalCore
                 exParams.getSimulationParameters().setDx(dxdyChange.getKey());
                 exParams.getSimulationParameters().setDy(dxdyChange.getValue());
-                setUpAndRunAnalyticalCoreController(hormonicCount);
+                setUpAndRunAnalyticalCoreController(exParams, hormonicCount);
+                compareAnalyticalAndNumMethodResultRepresentation();
             })
             );
             controller.takeControl();
@@ -76,14 +85,17 @@ public class MainApp extends Application {
         }
     }
 
+
+    private void compareAnalyticalAndNumMethodResultRepresentation(){
+        OutputCompareModController controller = new OutputCompareModController(switcher);
+        controller.takeControl();
+    }
+
     private void showResultsDefaultMode(){
         OutputDefaultModeController controller = new OutputDefaultModeController(switcher);
         controller.takeControl();
     }
 
-    private void showResultCompareMod(){
-
-    }
 
     private Pair<Double, Double> setUpNumCoreController(ExperimentParameters params){ //возвращает изменённые (не факт что) dx и dy
         log.info("Setting up CoreController");
@@ -93,7 +105,7 @@ public class MainApp extends Application {
         return new Pair<>(params.getSimulationParameters().getDx(), params.getSimulationParameters().getDy());
     }
 
-    private void setUpAndRunAnalyticalCoreController(int hormonicCount){
+    private void setUpAndRunAnalyticalCoreController(ExperimentParameters exParams, int hormonicCount){
         AnalyticalCoreController controller = new AnalyticalCoreController(exParams, hormonicCount);
         controller.run();
     }

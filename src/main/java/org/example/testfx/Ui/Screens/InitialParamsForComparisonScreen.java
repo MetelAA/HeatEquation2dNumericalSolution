@@ -1,21 +1,26 @@
 package org.example.testfx.Ui.Screens;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.example.testfx.Constants.Constants;
+import org.example.testfx.DTO.CompareNExperimentParameters;
 import org.example.testfx.DTO.NumeralInitialPlateParameters;
 import org.example.testfx.DTO.PlateParameters;
 import org.example.testfx.DTO.SimulationParameters;
+import org.example.testfx.Exceptions.ParameterFileParseException;
 import org.example.testfx.Ui.Screen;
+import org.example.testfx.Utils.FileUtils.ReadWriteNumericParamsFromFile;
 import org.example.testfx.Utils.InitParametersForCompareFinishedCallback;
+
+import java.util.function.Consumer;
 
 public class InitialParamsForComparisonScreen implements Screen {
     private final BorderPane root;
@@ -53,7 +58,10 @@ public class InitialParamsForComparisonScreen implements Screen {
     private final Text errorText = new Text();
     private final HBox buttonAndErrorBox = new HBox();
 
-    public InitialParamsForComparisonScreen(InitParametersForCompareFinishedCallback callback) {
+    private final Consumer<CompareNExperimentParameters> loadFromFileShortCut;
+
+    public InitialParamsForComparisonScreen(InitParametersForCompareFinishedCallback callback, Consumer<CompareNExperimentParameters> loadFromFileShortCut) {
+        this.loadFromFileShortCut = loadFromFileShortCut;
         root = new BorderPane();
         this.callback = callback;
 
@@ -87,6 +95,25 @@ public class InitialParamsForComparisonScreen implements Screen {
 
         framesWritesField.setText(String.valueOf(Constants.WRITE_FRAME_PER_SECOND));
 
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Button loadParamsFromFileBtn = new Button("Загрузить данные с предыдущего раза");
+
+
+        loadParamsFromFileBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try{
+                    loadFromFileShortCut.accept(ReadWriteNumericParamsFromFile.readCompareParameters());
+                } catch (ParameterFileParseException e) {
+                    errorText.setText("Ошибка парсинга файла!");
+                }
+            }
+        });
+
+        HBox bottomHBox = new HBox();
+        bottomHBox.getChildren().addAll(buttonAndErrorBox, spacer, loadParamsFromFileBtn);
+
         mainLayout.getChildren().addAll(
                 areaSizeCaption, areaSizeFields,
                 materialPropertiesCaption, densityTextField, specificHeatCapacityTextField, coefficientOfThermalConductivity,
@@ -103,7 +130,7 @@ public class InitialParamsForComparisonScreen implements Screen {
                 timeText, timeField,
                 framesWriteText, framesWritesField,
                 analyticalHormonicCountCaption, analyticalHormonicCountTextField,
-                buttonAndErrorBox
+                bottomHBox
         );
 
         HBox horizontalWrapper = new HBox(mainLayout);

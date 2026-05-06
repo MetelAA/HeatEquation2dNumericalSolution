@@ -1,29 +1,27 @@
 package org.example.testfx.Ui.Screens;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.example.testfx.DTO.ExperimentalNMapParameters;
+import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.Ui.Component.HeatmapPlayerComponent;
 import org.example.testfx.Ui.Screen;
 import org.example.testfx.Utils.DefaultCallback;
-import org.example.testfx.Utils.FileUtils.TempMapReaderWrapper;
+import org.example.testfx.Utils.TempMapDataProducer;
 
 public class OutputCompareModFirstScreen implements Screen {
     private final BorderPane root;
     private final DefaultCallback callback;
 
-    public OutputCompareModFirstScreen(TempMapReaderWrapper framesSupplier, ExperimentalNMapParameters params, DefaultCallback callback) {
+    public OutputCompareModFirstScreen(TempMapDataProducer frameDataProducer, ExperimentNMapParameters params, DefaultCallback callback) {
         this.callback = callback;
         root = new BorderPane();
 
         VBox v1 = new VBox();
-        HeatmapPlayerComponent playerComponent = new HeatmapPlayerComponent(framesSupplier, params);
+        HeatmapPlayerComponent playerComponent = new HeatmapPlayerComponent(frameDataProducer, params, -10, 10, HeatmapPlayerComponent.HeatmapPlayerComponentWorkMods.DYNAMIC_GRADIENT);
 
         Button nextScreenBtn = new Button("Дальше");
         nextScreenBtn.setOnAction(actionEvent -> callback.callback());

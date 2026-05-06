@@ -1,7 +1,7 @@
 package org.example.tests;
 
 import org.example.testfx.Constants.Constants;
-import org.example.testfx.DTO.ExperimentalNMapParameters;
+import org.example.testfx.DTO.ExperimentNMapParameters;
 import org.example.testfx.Utils.FileUtils.TempMapReader;
 import org.example.testfx.Utils.FileUtils.TempMapReaderWrapper;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class MainTest {
     public static void main(String[] args) throws IOException {
-        ExperimentalNMapParameters params;
+        ExperimentNMapParameters params;
         try {
             params = TempMapReader.getParams();
         } catch (FileNotFoundException e) {

@@ -2,20 +2,20 @@
   "plateParameters": {
     "numeralParameters": {
       "width": 1.0,
-      "height": 1.0,
-      "density": 220.0,
-      "heatCapacity": 220.0,
+      "height": 0.5,
+      "density": 2200.0,
+      "heatCapacity": 200.0,
       "heatConductivity": 2.0,
       "plateTemperature": 20.0
     },
-    "boundaryTemperatureEquationUp": "105.92065491183894 - 529.6032745591947*x + 17920.629722921916*x^2 - 51643.47607052897*x^3 + 51113.87279596977*x^4 - 16855.697732997483*x^5",
-    "boundaryTemperatureEquationBottom": "220*x+25"
+    "boundaryTemperatureEquationUp": "200*sin(80*x)+260",
+    "boundaryTemperatureEquationBottom": "220.42947103274537 - 271.95843828715283*x + 11994.798488664985*x^2 - 36556.93954659949*x^3 + 41122.97858942065*x^4 - 15040.732997481105*x^5"
   },
   "simulationParameters": {
     "dt": 0.1,
     "dx": 0.05,
     "dy": 0.05,
-    "time": 5000,
+    "time": 10000,
     "frameWritesPerSecond": 0.1
   }
 }

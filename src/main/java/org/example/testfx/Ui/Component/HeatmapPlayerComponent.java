@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -13,9 +12,8 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.testfx.Constants.Constants;
-import org.example.testfx.DTO.ExperimentalNMapParameters;
-import org.example.testfx.Ui.Screens.OutputDefaultModeScreen;
-import org.example.testfx.Utils.FileUtils.TempMapReaderWrapper;
+import org.example.testfx.DTO.ExperimentNMapParameters;
+import org.example.testfx.Utils.TempMapDataProducer;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -26,23 +24,28 @@ public class HeatmapPlayerComponent extends VBox {
     private final static Logger log = LogManager.getLogger(HeatmapPlayerComponent.class);
 
     private final HeatmapComponent heatmap;
-    private final TempMapReaderWrapper framesSupplier;
-    private final HeatmapPlaybackThread playbackThread;
+    private final TempMapDataProducer dataSupplier;
+    private HeatmapPlaybackThread playbackThread;
 
-    private final ExperimentalNMapParameters params;
+    private final ExperimentNMapParameters params;
 
     private final Text actualTimeInfoText = new Text();
     private final Button playPauseBtn = new Button();
     private final ChoiceBox<String> changeStepMultiplierChoiceBox = new ChoiceBox<>();
     private final ChoiceBox<String> changeFPSChoiceBox = new ChoiceBox<>();
     private int fps = Constants.DEFAULT_FPS;
+    private final HeatmapPlayerComponentWorkMods workMod;
+
+    private HeatmapGradientTemperatureDynamicLimitsChecker temperatureLimitsChecker;
+
 
     // Фиксированная ширина для числовых полей, чтобы текст не сдвигал соседей
     private static final double FIXED_VALUE_WIDTH = 130;
 
-    public HeatmapPlayerComponent(TempMapReaderWrapper framesSupplier, ExperimentalNMapParameters params) {
-        this.framesSupplier = framesSupplier;
+    public HeatmapPlayerComponent(TempMapDataProducer dataSupplier, ExperimentNMapParameters params, HeatmapPlayerComponentWorkMods workMod) {
+        this.dataSupplier = dataSupplier;
         this.params = params;
+        this.workMod = workMod;
         {
             double[][] firstFrame = getFrameWithoutError().get(); // нулевой кадр всегда есть!!!!
             heatmap = new HeatmapComponent(params.getExParams().getPlateParameters().getNumeralParameters().width(),
@@ -51,7 +54,37 @@ public class HeatmapPlayerComponent extends VBox {
                     Math.ceil(params.getMaxTemp() / 10.0) * 10,
                     firstFrame);
         }
+        temperatureLimitsChecker = new HeatmapGradientTemperatureDynamicLimitsChecker(
+                heatmap, params.getMinTemp(), params.getMaxTemp()
+        );
+        construct();
+    }
 
+    public HeatmapPlayerComponent(TempMapDataProducer dataSupplier, ExperimentNMapParameters params, double minT, double maxT, HeatmapPlayerComponentWorkMods workMod) {
+        this.dataSupplier = dataSupplier;
+        this.params = params;
+        this.workMod = workMod;
+        {
+            double[][] firstFrame = getFrameWithoutError().get(); // нулевой кадр всегда есть!!!!
+            heatmap = new HeatmapComponent(params.getExParams().getPlateParameters().getNumeralParameters().width(),
+                    params.getExParams().getPlateParameters().getNumeralParameters().height(),
+                    minT,
+                    maxT,
+                    firstFrame
+            );
+        }
+
+        if(workMod.equals(HeatmapPlayerComponentWorkMods.DYNAMIC_GRADIENT)){ //инициализируем наблюдателя за изменениями температурных лимитов
+            log.info("WorkMod = dynamic gradient work mod, initializing HeatmapGradientTemperatureDynamicLimitsChecker");
+            temperatureLimitsChecker = new HeatmapGradientTemperatureDynamicLimitsChecker(
+                    heatmap, minT, maxT
+            );
+            log.info("HeatmapGradientTemperatureDynamicLimitsChecker set up successfully");
+        }
+        construct();
+    }
+
+    private void construct(){
         HBox controlPanel = new HBox(15); // расстояние между элементами
         controlPanel.setStyle("-fx-padding: 10; -fx-alignment: center-left;");
 
@@ -102,13 +135,20 @@ public class HeatmapPlayerComponent extends VBox {
         toEndButton.setOnAction(this::toEndBtnClick);
         controlPanel.getChildren().add(toEndButton);
 
-        playbackThread = new HeatmapPlaybackThread(heatmap,
+        playbackThread = new HeatmapPlaybackThread(
+                heatmap,
                 new Supplier<Optional<double[][]>>() {
                     @Override
                     public Optional<double[][]> get() {
                         Optional<double[][]> frame = getFrameWithoutError();
-
-                        double currentTime = framesSupplier.getCurrentFrameNumber() / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
+                        if (workMod.equals(HeatmapPlayerComponentWorkMods.DYNAMIC_GRADIENT)
+                            && (dataSupplier.getCurrentFrameNumber() % Constants.DYNAMIC_GRADIENT_TEMPERATURE_LIMITS_CHECK_INTERVAL == 0)
+                            && frame.isPresent()
+                        ){
+                            //раз в столько то кадров отдаём чекеру данные, чтобы он пересмотрел (при надобности) лимиты температур
+                            temperatureLimitsChecker.checkAndIfTrueRedrawGradient(frame.get());
+                        }
+                        double currentTime = dataSupplier.getCurrentFrameNumber() / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
                         Platform.runLater(() -> {
                             actualTimeInfoText.setText(String.format("тек. время: %.2f сек", currentTime));
                             if (frame.isEmpty()) {
@@ -129,12 +169,11 @@ public class HeatmapPlayerComponent extends VBox {
         setSpacing(10);
     }
 
-
     private Optional<double[][]> getFrameWithoutError(){
         try {
-            return framesSupplier.getNextFrame();
+            return dataSupplier.getNextFrame();
         } catch (IOException e) {
-            throw new RuntimeException("OutputDefaultModeScreen: error when reading frame NUM: |" + framesSupplier.getCurrentFrameNumber() + "| frame by tmapReaderWrapper, with error: " + e);
+            throw new RuntimeException("OutputDefaultModeScreen: error when reading frame NUM: |" + dataSupplier.getCurrentFrameNumber() + "| frame by tmapReaderWrapper, with error: " + e);
         }
     }
 
@@ -165,7 +204,7 @@ public class HeatmapPlayerComponent extends VBox {
         PauseTransition delay1 = new PauseTransition(Duration.millis(100));
         delay1.setOnFinished(e -> {
             try {
-                framesSupplier.setPointerToLastFrame();
+                dataSupplier.setPointerToLastFrame();
             } catch (IOException ex) {
                 throw new RuntimeException("OutputDefaultModeScreen: error when setting fileReader pointer before last frame, with error: " + ex);
             }
@@ -173,7 +212,7 @@ public class HeatmapPlayerComponent extends VBox {
             PauseTransition delay2 = new PauseTransition(Duration.millis(50));
             delay2.setOnFinished(e2 -> {
                 playPauseBtn.fire();
-                double currentTime = (framesSupplier.getCurrentFrameNumber() + 1) / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
+                double currentTime = (dataSupplier.getCurrentFrameNumber() + 1) / params.getExParams().getSimulationParameters().getFrameWritesPerSecond();
                 actualTimeInfoText.setText(String.format("тек. время: %.2f сек", currentTime));
             });
             delay2.play();
@@ -184,13 +223,13 @@ public class HeatmapPlayerComponent extends VBox {
     public void changeStepMultiplierChoiceBox(ActionEvent actionEvent) {
         switch (changeStepMultiplierChoiceBox.getValue()) {
             case "x1":
-                framesSupplier.changeFrameStepMultiplier(1);
+                dataSupplier.changeFrameStepMultiplier(1);
                 break;
             case "x3":
-                framesSupplier.changeFrameStepMultiplier(3);
+                dataSupplier.changeFrameStepMultiplier(3);
                 break;
             case "x5":
-                framesSupplier.changeFrameStepMultiplier(5);
+                dataSupplier.changeFrameStepMultiplier(5);
                 break;
         }
     }
@@ -218,4 +257,9 @@ public class HeatmapPlayerComponent extends VBox {
         }
     }
 
+
+    public enum HeatmapPlayerComponentWorkMods{
+        STATIC_GRADIENT,
+        DYNAMIC_GRADIENT
+    }
 }
